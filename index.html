@@ -4,531 +4,501 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>DigiLocker — File Explorer</title>
-<meta name="description" content="Your personal DigiLocker — securely store, access and share documents in a familiar file explorer interface." />
-<link rel="icon" type="image/x-icon" href="data:image/x-icon;base64,AAABAAEAEBAAAAEAIABoBAAAFgAAACgAAAAQAAAAIAAAAAEAIAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/wAAAP8AAAD/AAAAAAAAAP8AAAD/AAAA/wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD/AABM/wAATP8AAET/AABM/wAATP8AAAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAP8AAET/AABM/wAATP8AAET/AABM/wAATP8AAAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/wAAAP8AAAD/AAAA/wAATP8AAET/AABM/wAATP8AAAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/wAATP8AAET/AABM/wAATP8AAET/AABM/wAATP8AAAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/wAATP8AAET/AABM/wAATP8AAET/AABM/wAATP8AAAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/wAATP8AAET/AABM/wAATP8AAET/AABM/wAATP8AAAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/wAATP8AAET/AABM/wAATP8AAET/AABM/wAATP8AAAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/wAATP8AAET/AABM/wAATP8AAET/AABM/wAATP8AAAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/wAATP8AAET/AABM/wAATP8AAET/AABM/wAATP8AAAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=" />
+<meta name="description" content="Your personal DigiLocker — securely store, access and share documents." />
+
+<!-- Favicon as inline SVG data URI -->
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%232563eb'/%3E%3Cpath d='M6 10h8l2 3h10a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V12a2 2 0 0 1 2-2z' fill='white'/%3E%3C/svg%3E" />
+
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&family=Instrument+Serif&display=swap" />
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&family=Instrument+Serif&display=swap" rel="stylesheet" />
+
 <style>
-  /* =================================================================
-     Windows 11 File Explorer inspired DigiLocker
-     ================================================================= */
+:root {
+  --bg: #eef1f6;
+  --chrome: rgba(255,255,255,0.72);
+  --chrome-2: rgba(255,255,255,0.88);
+  --panel: #ffffff;
+  --border: rgba(15,23,42,0.08);
+  --border-strong: rgba(15,23,42,0.16);
+  --text: #0f172a;
+  --text-muted: #475569;
+  --text-faint: #94a3b8;
+  --accent: #2563eb;
+  --accent-hover: #1d4ed8;
+  --accent-soft: #dbe7ff;
+  --accent-soft-2: #eef3ff;
+  --selection: #dbeafe;
+  --selection-border: #93c5fd;
+  --shadow: 0 24px 60px -20px rgba(15,23,42,0.25), 0 8px 24px -12px rgba(15,23,42,0.12);
+  --shadow-sm: 0 1px 2px rgba(15,23,42,0.05);
+  --radius: 14px;
+  --radius-sm: 8px;
+  --font: "Inter Tight", "Segoe UI", -apple-system, system-ui, sans-serif;
+  --font-display: "Instrument Serif", serif;
+  --app-bg: radial-gradient(1200px 800px at 0% 0%, #e0e7ff 0%, transparent 55%),
+            radial-gradient(1000px 700px at 100% 100%, #dbeafe 0%, transparent 55%),
+            linear-gradient(180deg, #f5f7fb 0%, #eef1f6 100%);
+}
+
+@media (prefers-color-scheme: dark) {
   :root {
-    --bg: #eef1f6;
-    --chrome: rgba(255,255,255,0.72);
-    --chrome-2: rgba(255,255,255,0.85);
-    --panel: #ffffff;
-    --border: rgba(15, 23, 42, 0.08);
-    --border-strong: rgba(15, 23, 42, 0.16);
-    --text: #0f172a;
-    --text-muted: #475569;
-    --text-faint: #94a3b8;
-    --accent: #2563eb;
-    --accent-hover: #1d4ed8;
-    --accent-soft: #dbe7ff;
-    --accent-soft-2: #eef3ff;
-    --selection: #dbeafe;
-    --selection-border: #93c5fd;
-    --shadow: 0 24px 60px -20px rgba(15, 23, 42, 0.25), 0 8px 24px -12px rgba(15, 23, 42, 0.12);
-    --shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.05);
-    --radius: 14px;
-    --radius-sm: 8px;
-    --font: "Inter Tight", "Inter", "Segoe UI Variable", "Segoe UI", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
-    --font-mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
-    --font-display: "Instrument Serif", "Inter Tight", serif;
-    --app-bg: radial-gradient(1200px 800px at 0% 0%, #e0e7ff 0%, transparent 55%),
-              radial-gradient(1000px 700px at 100% 100%, #dbeafe 0%, transparent 55%),
-              linear-gradient(180deg, #f5f7fb 0%, #eef1f6 100%);
+    --bg: #0b1020;
+    --chrome: rgba(20,26,45,0.72);
+    --chrome-2: rgba(28,35,56,0.88);
+    --panel: #141a2d;
+    --border: rgba(255,255,255,0.08);
+    --border-strong: rgba(255,255,255,0.16);
+    --text: #f1f5f9;
+    --text-muted: #cbd5e1;
+    --text-faint: #64748b;
+    --accent: #60a5fa;
+    --accent-hover: #93c5fd;
+    --accent-soft: rgba(96,165,250,0.18);
+    --accent-soft-2: rgba(96,165,250,0.10);
+    --selection: rgba(96,165,250,0.22);
+    --selection-border: rgba(96,165,250,0.45);
+    --shadow: 0 24px 60px -20px rgba(0,0,0,0.6), 0 8px 24px -12px rgba(0,0,0,0.4);
+    --app-bg: radial-gradient(1200px 800px at 0% 0%,#1e1b4b 0%,transparent 55%),
+              radial-gradient(1000px 700px at 100% 100%,#0c1e3e 0%,transparent 55%),
+              linear-gradient(180deg,#060914 0%,#0b1020 100%);
   }
+}
 
-  @media (prefers-color-scheme: dark) {
-    :root {
-      --bg: #0b1020;
-      --chrome: rgba(20, 26, 45, 0.72);
-      --chrome-2: rgba(28, 35, 56, 0.85);
-      --panel: #141a2d;
-      --border: rgba(255,255,255,0.08);
-      --border-strong: rgba(255,255,255,0.16);
-      --text: #f1f5f9;
-      --text-muted: #cbd5e1;
-      --text-faint: #94a3b8;
-      --accent: #60a5fa;
-      --accent-hover: #93c5fd;
-      --accent-soft: rgba(96,165,250,0.18);
-      --accent-soft-2: rgba(96,165,250,0.10);
-      --selection: rgba(96,165,250,0.22);
-      --selection-border: rgba(96,165,250,0.45);
-      --shadow: 0 24px 60px -20px rgba(0,0,0,0.6), 0 8px 24px -12px rgba(0,0,0,0.4);
-      --app-bg: radial-gradient(1200px 800px at 0% 0%, #1e1b4b 0%, transparent 55%),
-                radial-gradient(1000px 700px at 100% 100%, #0c1e3e 0%, transparent 55%),
-                linear-gradient(180deg, #060914 0%, #0b1020 100%);
-    }
-  }
+*, *::before, *::after { box-sizing: border-box; }
+html, body { height: 100%; margin: 0; }
 
-  * { box-sizing: border-box; }
-  html, body { height: 100%; }
-  body {
-    margin: 0;
-    font-family: var(--font);
-    font-size: 14px;
-    font-feature-settings: "cv11", "ss01", "ss03";
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    letter-spacing: -0.01em;
-    color: var(--text);
-    background: var(--app-bg);
-    background-attachment: fixed;
-    overflow: hidden;
-  }
+body {
+  font-family: var(--font);
+  font-size: 14px;
+  -webkit-font-smoothing: antialiased;
+  letter-spacing: -0.01em;
+  color: var(--text);
+  background: var(--app-bg);
+  background-attachment: fixed;
+  overflow: hidden;
+}
 
+/* ======================== AUTH SCREEN ======================== */
+.auth-overlay {
+  position: fixed; inset: 0;
+  background:
+    radial-gradient(900px 600px at 15% 20%, rgba(99,102,241,0.55), transparent 60%),
+    radial-gradient(900px 600px at 85% 85%, rgba(59,130,246,0.55), transparent 60%),
+    linear-gradient(135deg, #0b1226 0%, #1e1b4b 50%, #0c2657 100%);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 100; padding: 20px;
+  transition: opacity .3s ease;
+}
+.auth-overlay.hidden { display: none; }
 
-  /* ----------------------------- Window shell ------------------------ */
-  .window {
-    width: min(1400px, 96vw); height: min(900px, 94vh);
-    margin: 3vh auto;
-    display: grid;
-    grid-template-rows: 36px auto auto 1fr 28px;
-    background: var(--chrome);
-    backdrop-filter: blur(24px) saturate(160%);
-    -webkit-backdrop-filter: blur(24px) saturate(160%);
-    border: 1px solid var(--border);
-    border-radius: 18px;
-    box-shadow: var(--shadow);
-    overflow: hidden;
-  }
+.auth-card {
+  width: 100%; max-width: 420px;
+  background: rgba(255,255,255,0.08);
+  backdrop-filter: blur(28px) saturate(160%);
+  -webkit-backdrop-filter: blur(28px) saturate(160%);
+  border: 1px solid rgba(255,255,255,0.18);
+  border-radius: 20px;
+  padding: 40px 36px;
+  box-shadow: 0 30px 80px rgba(0,0,0,0.45);
+  color: #fff;
+}
+.auth-card .brand {
+  display: flex; align-items: center; gap: 12px; justify-content: center;
+  margin-bottom: 6px;
+}
+.auth-card .brand svg { width: 32px; height: 32px; color: #93c5fd; }
+.auth-card .brand h1 {
+  font-family: var(--font-display);
+  font-size: 34px; margin: 0; font-weight: 400;
+  letter-spacing: -0.02em;
+  background: linear-gradient(180deg, #fff, #cbd5e1);
+  -webkit-background-clip: text; background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.auth-card .subtitle {
+  text-align: center; color: rgba(255,255,255,0.6);
+  font-size: 13px; margin: 4px 0 28px;
+}
+.auth-card label {
+  display: block; font-size: 11px; color: rgba(255,255,255,0.6);
+  margin-bottom: 6px; text-transform: uppercase;
+  letter-spacing: 0.08em; font-weight: 600;
+}
+.auth-card input {
+  width: 100%; padding: 12px 14px;
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 10px;
+  font-size: 14px; font-family: var(--font);
+  background: rgba(255,255,255,0.06);
+  color: #fff; margin-bottom: 16px;
+  transition: all .2s;
+  outline: none;
+}
+.auth-card input::placeholder { color: rgba(255,255,255,0.35); }
+.auth-card input:focus {
+  border-color: rgba(147,197,253,0.6);
+  background: rgba(255,255,255,0.10);
+  box-shadow: 0 0 0 4px rgba(147,197,253,0.15);
+}
+.auth-card .btn-row { display: flex; gap: 10px; margin-top: 8px; }
+.auth-card .auth-btn {
+  flex: 1; padding: 12px 14px;
+  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,0.15);
+  background: rgba(255,255,255,0.08);
+  color: #fff; font-family: var(--font);
+  font-size: 14px; font-weight: 600;
+  cursor: pointer; transition: all .15s ease;
+  letter-spacing: -0.005em;
+}
+.auth-card .auth-btn:hover {
+  background: rgba(255,255,255,0.14);
+  transform: translateY(-1px);
+}
+.auth-card .auth-btn:active { transform: translateY(0); }
+.auth-card .auth-btn.primary {
+  background: linear-gradient(180deg, #3b82f6, #2563eb);
+  border-color: rgba(59,130,246,0.6);
+  box-shadow: 0 8px 24px -8px rgba(59,130,246,0.7);
+}
+.auth-card .auth-btn.primary:hover {
+  background: linear-gradient(180deg, #60a5fa, #3b82f6);
+}
+.auth-card .auth-btn:disabled {
+  opacity: .6; cursor: not-allowed; transform: none;
+}
+.auth-card .divider {
+  text-align: center; color: rgba(255,255,255,0.4); font-size: 11px;
+  margin: 20px 0 14px; text-transform: uppercase; letter-spacing: 0.15em;
+  position: relative;
+}
+.auth-card .divider::before, .auth-card .divider::after {
+  content: ""; position: absolute; top: 50%;
+  width: calc(50% - 30px); height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+}
+.auth-card .divider::before { left: 0; }
+.auth-card .divider::after { right: 0; }
+.auth-card .google-btn {
+  width: 100%; padding: 12px 14px;
+  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,0.15);
+  background: rgba(255,255,255,0.08);
+  color: #fff; font-family: var(--font);
+  font-size: 14px; font-weight: 600;
+  cursor: pointer; transition: all .15s ease;
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+}
+.auth-card .google-btn:hover {
+  background: rgba(255,255,255,0.14); transform: translateY(-1px);
+}
+.auth-error {
+  background: rgba(239,68,68,0.2);
+  border: 1px solid rgba(239,68,68,0.4);
+  color: #fca5a5;
+  border-radius: 8px; padding: 10px 12px;
+  font-size: 13px; margin-bottom: 14px;
+  display: none;
+}
+.auth-error.show { display: block; }
+.auth-toggle {
+  text-align: center; margin-top: 16px;
+  font-size: 13px; color: rgba(255,255,255,0.5);
+}
+.auth-toggle a {
+  color: #93c5fd; cursor: pointer; text-decoration: none; font-weight: 600;
+}
+.auth-toggle a:hover { text-decoration: underline; }
 
+/* ======================== WINDOW ======================== */
+.window {
+  width: min(1400px, 96vw); height: min(900px, 94vh);
+  margin: 3vh auto;
+  display: grid;
+  grid-template-rows: 36px auto auto 1fr 28px;
+  background: var(--chrome);
+  backdrop-filter: blur(24px) saturate(160%);
+  -webkit-backdrop-filter: blur(24px) saturate(160%);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+.window.hidden { display: none; }
 
-  /* Title bar */
-  .titlebar {
-    display: flex; align-items: center;
-    padding: 0 0 0 12px;
-    font-size: 12px; color: var(--text-muted);
-    -webkit-app-region: drag;
-    user-select: none;
-    background: var(--chrome);
-    border-bottom: 1px solid transparent;
-  }
-  .titlebar .tab {
-    height: 30px;
-    margin-top: 6px;
-    padding: 0 16px;
-    display: flex; align-items: center; gap: 10px;
-    background: var(--chrome-2);
-    border: 1px solid var(--border);
-    border-bottom: 0;
-    border-radius: 10px 10px 0 0;
-    color: var(--text);
-    font-weight: 600;
-    font-size: 12.5px;
-    letter-spacing: -0.005em;
-  }
-  .titlebar .tab svg { width: 14px; height: 14px; color: var(--accent); }
-  .titlebar .spacer { flex: 1; }
-  .titlebar .winbtns { display: flex; }
-  .titlebar .winbtns button {
-    width: 46px; height: 36px;
-    background: transparent; border: 0; color: var(--text-muted);
-    cursor: default;
-    font-family: var(--font);
-  }
-  .titlebar .winbtns button:hover { background: rgba(15,23,42,0.06); }
-  .titlebar .winbtns button.close:hover { background: #e81123; color: #fff; }
+/* Title bar */
+.titlebar {
+  display: flex; align-items: center;
+  padding: 0 0 0 12px;
+  font-size: 12px; color: var(--text-muted);
+  user-select: none;
+  background: var(--chrome);
+  border-bottom: 1px solid transparent;
+}
+.titlebar .tab {
+  height: 30px; margin-top: 6px; padding: 0 16px;
+  display: flex; align-items: center; gap: 10px;
+  background: var(--chrome-2);
+  border: 1px solid var(--border); border-bottom: 0;
+  border-radius: 10px 10px 0 0;
+  color: var(--text); font-weight: 600; font-size: 12.5px;
+}
+.titlebar .tab svg { width: 14px; height: 14px; color: var(--accent); }
+.titlebar .spacer { flex: 1; }
+.titlebar .winbtns { display: flex; }
+.titlebar .winbtns button {
+  width: 46px; height: 36px;
+  background: transparent; border: 0; color: var(--text-muted);
+  cursor: default; font-family: var(--font); font-size: 13px;
+  transition: background .1s;
+}
+.titlebar .winbtns button:hover { background: rgba(15,23,42,0.06); }
+.titlebar .winbtns button.close-btn:hover { background: #e81123; color: #fff; }
 
-  /* Command bar */
-  .commandbar {
-    display: flex; align-items: center; gap: 4px;
-    padding: 8px 14px;
-    background: var(--chrome-2);
-    border-bottom: 1px solid var(--border);
-  }
-  .cmd-btn {
-    display: inline-flex; align-items: center; gap: 7px;
-    padding: 7px 12px;
-    border-radius: 8px;
-    border: 1px solid transparent;
-    background: transparent;
-    color: var(--text);
-    font-family: var(--font); font-size: 13px; font-weight: 500;
-    letter-spacing: -0.005em;
-    cursor: pointer;
-    transition: all .15s ease;
-  }
-  .cmd-btn:hover { background: rgba(15,23,42,0.05); }
-  .cmd-btn:disabled { opacity: .4; cursor: not-allowed; }
-  .cmd-btn.primary {
-    background: linear-gradient(180deg, var(--accent), var(--accent-hover));
-    color: #fff;
-    border-color: var(--accent-hover);
-    box-shadow: 0 6px 16px -8px rgba(37, 99, 235, 0.6);
-  }
-  .cmd-btn.primary:hover { filter: brightness(1.08); transform: translateY(-1px); }
-  .cmd-btn svg { width: 16px; height: 16px; }
-  .cmd-sep { width: 1px; height: 22px; background: var(--border); margin: 0 6px; }
+/* Command bar */
+.commandbar {
+  display: flex; align-items: center; gap: 4px;
+  padding: 8px 14px;
+  background: var(--chrome-2);
+  border-bottom: 1px solid var(--border);
+}
+.cmd-btn {
+  display: inline-flex; align-items: center; gap: 7px;
+  padding: 7px 12px; border-radius: 8px;
+  border: 1px solid transparent; background: transparent;
+  color: var(--text); font-family: var(--font);
+  font-size: 13px; font-weight: 500; cursor: pointer;
+  transition: all .15s ease; letter-spacing: -0.005em;
+}
+.cmd-btn:hover { background: rgba(15,23,42,0.05); }
+.cmd-btn:disabled { opacity: .4; cursor: not-allowed; }
+.cmd-btn.primary {
+  background: linear-gradient(180deg, var(--accent), var(--accent-hover));
+  color: #fff; border-color: var(--accent-hover);
+  box-shadow: 0 6px 16px -8px rgba(37,99,235,0.6);
+}
+.cmd-btn.primary:hover { filter: brightness(1.08); transform: translateY(-1px); }
+.cmd-btn svg { width: 16px; height: 16px; }
+.cmd-sep { width: 1px; height: 22px; background: var(--border); margin: 0 6px; }
 
+/* Address bar */
+.addressbar {
+  display: flex; align-items: center; gap: 8px;
+  padding: 6px 12px;
+  background: var(--chrome-2); border-bottom: 1px solid var(--border);
+}
+.nav-arrows { display: flex; gap: 2px; }
+.nav-arrows button {
+  width: 28px; height: 28px; border-radius: var(--radius-sm);
+  border: 0; background: transparent; cursor: pointer;
+  color: var(--text-muted);
+  display: inline-flex; align-items: center; justify-content: center;
+  transition: background .1s;
+}
+.nav-arrows button:hover:not(:disabled) { background: rgba(0,0,0,0.06); color: var(--text); }
+.nav-arrows button:disabled { opacity: .35; cursor: default; }
+.nav-arrows svg { width: 14px; height: 14px; }
+.crumbs {
+  flex: 1; display: flex; align-items: center;
+  background: var(--bg); border: 1px solid var(--border);
+  border-radius: var(--radius-sm); padding: 4px 8px; gap: 4px; overflow: hidden;
+}
+.crumb { display: inline-flex; align-items: center; gap: 4px; padding: 2px 6px; border-radius: 4px; }
+.crumb svg { width: 14px; height: 14px; color: var(--accent); }
+.crumb-sep { color: var(--text-faint); font-size: 10px; }
+.searchbox {
+  display: flex; align-items: center; gap: 6px;
+  background: var(--bg); border: 1px solid var(--border);
+  border-radius: var(--radius-sm); padding: 4px 10px; width: 240px;
+}
+.searchbox input {
+  border: 0; outline: 0; background: transparent;
+  flex: 1; color: var(--text); font-family: var(--font); font-size: 13px;
+}
+.searchbox svg { width: 14px; height: 14px; color: var(--text-faint); }
 
-  /* Address + search */
-  .addressbar {
-    display: flex; align-items: center; gap: 8px;
-    padding: 6px 12px;
-    background: var(--chrome-2);
-    border-bottom: 1px solid var(--border);
-  }
-  .nav-arrows { display: flex; gap: 2px; }
-  .nav-arrows button {
-    width: 28px; height: 28px;
-    border-radius: var(--radius-sm);
-    border: 0; background: transparent; cursor: pointer;
-    color: var(--text-muted);
-    display: inline-flex; align-items: center; justify-content: center;
-  }
-  .nav-arrows button:hover { background: rgba(0,0,0,0.06); color: var(--text); }
-  .nav-arrows button:disabled { opacity: .35; cursor: default; }
-  .nav-arrows svg { width: 14px; height: 14px; }
+/* Body */
+.body {
+  display: grid; grid-template-columns: 240px 1fr;
+  background: var(--panel); min-height: 0;
+}
+.sidebar {
+  border-right: 1px solid var(--border);
+  background: var(--chrome); padding: 8px 6px; overflow-y: auto;
+}
+.side-group { margin-bottom: 8px; }
+.side-group-title {
+  font-size: 10px; text-transform: uppercase; letter-spacing: 0.12em;
+  color: var(--text-faint); font-weight: 700; padding: 10px 12px 6px;
+}
+.side-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 6px 10px; border-radius: var(--radius-sm);
+  cursor: pointer; color: var(--text); font-size: 13px;
+  transition: background .1s; position: relative;
+}
+.side-item:hover { background: rgba(0,0,0,0.05); }
+.side-item.active {
+  background: var(--accent-soft-2); font-weight: 600;
+}
+.side-item.active::before {
+  content: ""; position: absolute; left: 2px; top: 6px; bottom: 6px;
+  width: 3px; background: var(--accent); border-radius: 2px;
+}
+.side-item svg { width: 16px; height: 16px; color: var(--accent); flex-shrink: 0; }
 
-  .crumbs {
-    flex: 1;
-    display: flex; align-items: center;
-    background: var(--bg); border: 1px solid var(--border);
-    border-radius: var(--radius-sm);
-    padding: 4px 8px; gap: 4px;
-    min-width: 0; overflow: hidden;
-  }
-  .crumb { display: inline-flex; align-items: center; gap: 4px; padding: 2px 6px; border-radius: 4px; color: var(--text); cursor: default; }
-  .crumb svg { width: 14px; height: 14px; color: var(--accent); }
-  .crumb-sep { color: var(--text-faint); font-size: 10px; }
+/* Main pane */
+.main { display: flex; flex-direction: column; min-width: 0; min-height: 0; }
+.main-toolbar {
+  display: flex; align-items: center; gap: 6px;
+  padding: 6px 14px; border-bottom: 1px solid var(--border);
+  background: var(--chrome-2); font-size: 12px; color: var(--text-muted);
+}
+.view-toggle { display: flex; gap: 2px; margin-left: auto; }
+.view-toggle button {
+  width: 28px; height: 26px; border: 0;
+  border-radius: var(--radius-sm); background: transparent;
+  color: var(--text-muted); cursor: pointer;
+  display: inline-flex; align-items: center; justify-content: center;
+  transition: all .1s;
+}
+.view-toggle button:hover { background: rgba(0,0,0,0.06); color: var(--text); }
+.view-toggle button.active { background: var(--accent-soft); color: var(--accent); }
+.view-toggle svg { width: 15px; height: 15px; }
 
-  .searchbox {
-    display: flex; align-items: center; gap: 6px;
-    background: var(--bg); border: 1px solid var(--border);
-    border-radius: var(--radius-sm);
-    padding: 4px 10px; width: 240px;
-  }
-  .searchbox input {
-    border: 0; outline: 0; background: transparent;
-    flex: 1; color: var(--text); font-family: var(--font); font-size: 13px;
-  }
-  .searchbox svg { width: 14px; height: 14px; color: var(--text-faint); }
+.filearea {
+  flex: 1; overflow: auto; padding: 12px 14px 20px;
+  position: relative;
+}
+.filearea.drag-over { outline: 2px dashed var(--accent); outline-offset: -12px; background: var(--accent-soft-2); }
 
-  /* ----------------------------- Body ------------------------------- */
-  .body {
-    display: grid;
-    grid-template-columns: 240px 1fr;
-    background: var(--panel);
-    min-height: 0;
-  }
+/* Grid view */
+.files-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+  gap: 4px;
+}
+.file-card {
+  padding: 12px 6px 10px; border-radius: var(--radius-sm);
+  text-align: center; cursor: default; user-select: none;
+  border: 1px solid transparent; transition: background .1s;
+}
+.file-card:hover { background: rgba(0,0,0,0.04); }
+.file-card.selected { background: var(--selection); border-color: var(--selection-border); }
+.file-card .icon { width: 56px; height: 56px; margin: 0 auto 6px; display: flex; align-items: center; justify-content: center; }
+.file-card .icon svg { width: 100%; height: 100%; }
+.file-card .name { font-size: 12px; word-break: break-word; line-height: 1.3; max-height: 2.6em; overflow: hidden; }
 
-  /* Sidebar */
-  .sidebar {
-    border-right: 1px solid var(--border);
-    background: var(--chrome);
-    padding: 8px 6px;
-    overflow-y: auto;
-  }
-  .side-group { margin-bottom: 8px; }
-  .side-group-title {
-    font-size: 10px; text-transform: uppercase; letter-spacing: 0.12em;
-    color: var(--text-faint);
-    font-weight: 700;
-    padding: 10px 12px 6px;
-  }
+/* List view */
+.files-list { width: 100%; }
+.files-list .row-head, .files-list .row {
+  display: grid;
+  grid-template-columns: 1fr 150px 100px 80px;
+  align-items: center; padding: 6px 10px;
+  font-size: 13px; border-radius: 4px;
+}
+.files-list .row-head {
+  font-size: 12px; color: var(--text-faint);
+  border-bottom: 1px solid var(--border); font-weight: 600; border-radius: 0;
+  position: sticky; top: 0; background: var(--panel); z-index: 1;
+}
+.files-list .row { cursor: default; transition: background .1s; }
+.files-list .row:hover { background: rgba(0,0,0,0.04); }
+.files-list .row.selected { background: var(--selection); }
+.files-list .name-cell { display: flex; align-items: center; gap: 10px; min-width: 0; }
+.files-list .name-cell svg { width: 20px; height: 20px; flex-shrink: 0; }
+.files-list .name-cell span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-  .side-item {
-    display: flex; align-items: center; gap: 10px;
-    padding: 6px 10px;
-    border-radius: var(--radius-sm);
-    cursor: pointer; color: var(--text);
-    font-size: 13px;
-  }
-  .side-item:hover { background: rgba(0,0,0,0.05); }
-  .side-item.active {
-    background: var(--accent-soft-2);
-    color: var(--text);
-    font-weight: 600;
-    position: relative;
-  }
-  .side-item.active::before {
-    content: ""; position: absolute; left: 2px; top: 6px; bottom: 6px;
-    width: 3px; background: var(--accent); border-radius: 2px;
-  }
-  .side-item svg { width: 16px; height: 16px; color: var(--accent); flex-shrink: 0; }
+/* Empty state */
+.empty-state {
+  text-align: center; padding: 72px 20px;
+  color: var(--text-faint);
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  height: 100%;
+}
+.empty-state .big-icon { font-size: 64px; margin-bottom: 14px; opacity: .55; }
+.empty-state h3 {
+  margin: 8px 0 6px; color: var(--text-muted);
+  font-family: var(--font-display); font-weight: 400;
+  font-size: 26px; letter-spacing: -0.01em;
+}
+.empty-state p { font-size: 13px; color: var(--text-faint); margin: 0 0 20px; }
+.empty-upload-btn {
+  display: inline-flex; align-items: center; gap: 10px;
+  padding: 14px 28px; border-radius: 12px;
+  background: linear-gradient(180deg, var(--accent), var(--accent-hover));
+  color: #fff; border: none; font-family: var(--font);
+  font-size: 15px; font-weight: 600; cursor: pointer;
+  box-shadow: 0 8px 24px -8px rgba(37,99,235,0.6);
+  transition: all .2s ease; letter-spacing: -0.01em;
+}
+.empty-upload-btn:hover { filter: brightness(1.1); transform: translateY(-2px); box-shadow: 0 12px 30px -8px rgba(37,99,235,0.7); }
+.empty-upload-btn:active { transform: translateY(0); }
+.empty-upload-btn svg { width: 20px; height: 20px; }
 
-  /* Main pane */
-  .main {
-    display: flex; flex-direction: column;
-    min-width: 0; min-height: 0;
-  }
-  .main-toolbar {
-    display: flex; align-items: center; gap: 6px;
-    padding: 6px 14px;
-    border-bottom: 1px solid var(--border);
-    background: var(--chrome-2);
-    font-size: 12px; color: var(--text-muted);
-  }
-  .view-toggle { display: flex; gap: 2px; margin-left: auto; }
-  .view-toggle button {
-    width: 28px; height: 26px; border: 0;
-    border-radius: var(--radius-sm); background: transparent;
-    color: var(--text-muted); cursor: pointer;
-    display: inline-flex; align-items: center; justify-content: center;
-  }
-  .view-toggle button:hover { background: rgba(0,0,0,0.06); color: var(--text); }
-  .view-toggle button.active { background: var(--accent-soft); color: var(--accent); }
-  .view-toggle svg { width: 15px; height: 15px; }
+/* Status bar */
+.statusbar {
+  border-top: 1px solid var(--border); background: var(--chrome-2);
+  padding: 4px 14px; display: flex; align-items: center; gap: 16px;
+  font-size: 12px; color: var(--text-muted);
+}
+.statusbar .right { margin-left: auto; display: flex; align-items: center; gap: 12px; }
 
-  .filearea {
-    flex: 1;
-    overflow: auto;
-    padding: 12px 14px 20px;
-    position: relative;
-  }
-  .filearea.drag-over::after {
-    content: "Drop to upload";
-    position: absolute; inset: 12px;
-    border: 2px dashed var(--accent);
-    background: var(--accent-soft-2);
-    color: var(--accent);
-    border-radius: var(--radius);
-    display: flex; align-items: center; justify-content: center;
-    font-weight: 600; font-size: 16px;
-    pointer-events: none;
-  }
+/* User chip */
+.user-chip {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 4px 10px 4px 4px; border-radius: 20px;
+  background: var(--bg); border: 1px solid var(--border); font-size: 12px;
+}
+.user-chip .avatar {
+  width: 24px; height: 24px; border-radius: 50%;
+  background: var(--accent); color: #fff;
+  display: inline-flex; align-items: center; justify-content: center;
+  font-weight: 700; font-size: 11px;
+}
+.user-chip .signout {
+  border: 0; background: transparent; color: var(--text-faint);
+  cursor: pointer; padding: 0 2px; font-size: 12px; font-family: var(--font);
+  transition: color .1s;
+}
+.user-chip .signout:hover { color: #e81123; }
 
-  /* Grid view */
-  .files-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
-    gap: 4px;
-  }
-  .file-card {
-    padding: 12px 6px 10px;
-    border-radius: var(--radius-sm);
-    text-align: center;
-    cursor: default;
-    user-select: none;
-    border: 1px solid transparent;
-    transition: background .1s;
-  }
-  .file-card:hover { background: rgba(0,0,0,0.04); }
-  .file-card.selected {
-    background: var(--selection);
-    border-color: var(--selection-border);
-  }
-  .file-card .icon {
-    width: 56px; height: 56px;
-    margin: 0 auto 6px;
-    display: flex; align-items: center; justify-content: center;
-  }
-  .file-card .icon svg { width: 100%; height: 100%; }
-  .file-card .name {
-    font-size: 12px;
-    word-wrap: break-word;
-    line-height: 1.3;
-    max-height: 2.6em;
-    overflow: hidden;
-  }
+/* Toast */
+.toast {
+  position: fixed; bottom: 40px; left: 50%; transform: translateX(-50%) translateY(8px);
+  background: var(--text); color: var(--panel);
+  padding: 10px 18px; border-radius: 8px; font-size: 13px;
+  box-shadow: var(--shadow); opacity: 0; pointer-events: none;
+  transition: opacity .2s, transform .2s; z-index: 999;
+}
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
-  /* Details view */
-  .files-list { width: 100%; }
-  .files-list .row-head, .files-list .row {
-    display: grid;
-    grid-template-columns: 1fr 140px 90px 80px;
-    align-items: center;
-    padding: 6px 10px;
-    font-size: 13px;
-    border-bottom: 1px solid transparent;
-  }
-  .files-list .row-head {
-    font-size: 12px; color: var(--text-faint);
-    border-bottom: 1px solid var(--border);
-    text-transform: none; font-weight: 600;
-  }
-  .files-list .row { cursor: default; border-radius: 4px; }
-  .files-list .row:hover { background: rgba(0,0,0,0.04); }
-  .files-list .row.selected { background: var(--selection); }
-  .files-list .row .name-cell {
-    display: flex; align-items: center; gap: 10px;
-    min-width: 0;
-  }
-  .files-list .row .name-cell svg { width: 20px; height: 20px; flex-shrink: 0; }
-  .files-list .row .name-cell span {
-    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-  }
-  .files-list .row .actions a {
-    color: var(--accent); text-decoration: none; font-size: 12px; font-weight: 600;
-  }
-  .files-list .row .actions a:hover { text-decoration: underline; }
+/* Loading spinner */
+.spinner {
+  width: 36px; height: 36px; margin: 0 auto 16px;
+  border: 3px solid var(--border); border-top-color: var(--accent);
+  border-radius: 50%; animation: spin .8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
 
-  .empty-state {
-    text-align: center;
-    padding: 72px 20px;
-    color: var(--text-faint);
-  }
-  .empty-state .big-icon { font-size: 72px; margin-bottom: 14px; opacity: .55; }
-  .empty-state h3 {
-    margin: 10px 0 6px;
-    color: var(--text-muted);
-    font-family: var(--font-display);
-    font-weight: 400;
-    font-size: 26px;
-    letter-spacing: -0.01em;
-  }
-  .empty-state p { font-size: 13px; color: var(--text-faint); }
-
-
-  /* Status bar */
-  .statusbar {
-    border-top: 1px solid var(--border);
-    background: var(--chrome-2);
-    padding: 4px 14px;
-    display: flex; align-items: center; gap: 16px;
-    font-size: 12px; color: var(--text-muted);
-  }
-  .statusbar .right { margin-left: auto; display: flex; align-items: center; gap: 12px; }
-
-  /* ============== Auth screen (modal-style overlay) ============== */
-  .auth-overlay {
-    position: fixed; inset: 0;
-    background:
-      radial-gradient(900px 600px at 15% 20%, rgba(99,102,241,0.55), transparent 60%),
-      radial-gradient(900px 600px at 85% 85%, rgba(59,130,246,0.55), transparent 60%),
-      linear-gradient(135deg, #0b1226 0%, #1e1b4b 50%, #0c2657 100%);
-    display: flex; align-items: center; justify-content: center;
-    z-index: 100;
-    padding: 20px;
-  }
-  .auth-card {
-    width: 100%; max-width: 420px;
-    background: rgba(255,255,255,0.08);
-    backdrop-filter: blur(28px) saturate(160%);
-    -webkit-backdrop-filter: blur(28px) saturate(160%);
-    border: 1px solid rgba(255,255,255,0.18);
-    border-radius: 20px;
-    padding: 40px 36px;
-    box-shadow: 0 30px 80px rgba(0,0,0,0.45);
-    color: #fff;
-  }
-  .auth-card .brand {
-    display: flex; align-items: center; gap: 12px; justify-content: center;
-    margin-bottom: 6px;
-  }
-  .auth-card .brand svg { width: 32px; height: 32px; color: #93c5fd; }
-  .auth-card .brand h1 {
-    font-family: var(--font-display);
-    font-size: 34px; margin: 0; font-weight: 400;
-    letter-spacing: -0.02em;
-    background: linear-gradient(180deg, #fff, #cbd5e1);
-    -webkit-background-clip: text; background-clip: text;
-    -webkit-text-fill-color: transparent;
-  }
-  .auth-card .subtitle {
-    text-align: center; color: rgba(255,255,255,0.7); font-size: 13px;
-    margin: 4px 0 28px;
-    letter-spacing: 0.01em;
-  }
-  .auth-card label {
-    display: block; font-size: 11px; color: rgba(255,255,255,0.6);
-    margin-bottom: 6px;
-    text-transform: uppercase; letter-spacing: 0.08em; font-weight: 600;
-  }
-  .auth-card input {
-    width: 100%; padding: 12px 14px;
-    border: 1px solid rgba(255,255,255,0.15);
-    border-radius: 10px;
-    font-size: 14px; font-family: var(--font);
-    background: rgba(255,255,255,0.06);
-    color: #fff;
-    margin-bottom: 16px;
-    transition: all .2s;
-  }
-  .auth-card input::placeholder { color: rgba(255,255,255,0.4); }
-  .auth-card input:focus {
-    outline: none;
-    border-color: rgba(147,197,253,0.6);
-    background: rgba(255,255,255,0.10);
-    box-shadow: 0 0 0 4px rgba(147,197,253,0.15);
-  }
-  .auth-card .btn-row { display: flex; gap: 10px; margin-top: 8px; }
-  .auth-card button {
-    flex: 1;
-    padding: 11px 14px;
-    border-radius: 10px;
-    border: 1px solid rgba(255,255,255,0.15);
-    background: rgba(255,255,255,0.08);
-    color: #fff;
-    font-family: var(--font); font-size: 14px; font-weight: 600;
-    letter-spacing: -0.005em;
-    cursor: pointer;
-    transition: all .15s ease;
-  }
-  .auth-card button:hover { background: rgba(255,255,255,0.14); transform: translateY(-1px); }
-  .auth-card button.primary {
-    background: linear-gradient(180deg, #3b82f6, #2563eb);
-    border-color: rgba(59,130,246,0.6);
-    box-shadow: 0 8px 24px -8px rgba(59,130,246,0.7);
-  }
-  .auth-card button.primary:hover {
-    background: linear-gradient(180deg, #60a5fa, #3b82f6);
-  }
-  .auth-card .google {
-    width: 100%; margin-top: 14px;
-    display: flex; align-items: center; justify-content: center; gap: 10px;
-  }
-  .auth-card .divider {
-    text-align: center; color: rgba(255,255,255,0.5); font-size: 11px;
-    margin: 22px 0 14px;
-    text-transform: uppercase; letter-spacing: 0.15em;
-    position: relative;
-  }
-  .auth-card .divider::before, .auth-card .divider::after {
-    content: ""; position: absolute; top: 50%; width: calc(50% - 28px); height: 1px;
-    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-  }
-  .auth-card .divider::before { left: 0; } .auth-card .divider::after { right: 0; }
-
-
-  .hidden { display: none !important; }
-
-  /* User chip in command bar */
-  .user-chip {
-    display: inline-flex; align-items: center; gap: 8px;
-    padding: 4px 10px 4px 4px;
-    border-radius: 20px;
-    background: var(--bg);
-    border: 1px solid var(--border);
-    font-size: 12px; color: var(--text);
-  }
-  .user-chip .avatar {
-    width: 24px; height: 24px; border-radius: 50%;
-    background: var(--accent); color: #fff;
-    display: inline-flex; align-items: center; justify-content: center;
-    font-weight: 700; font-size: 12px;
-  }
-  .user-chip button {
-    border: 0; background: transparent; color: var(--text-faint);
-    cursor: pointer; padding: 0 4px; font-size: 12px;
-  }
-  .user-chip button:hover { color: #e81123; }
-
-  /* Toast */
-  .toast {
-    position: fixed; bottom: 40px; left: 50%; transform: translateX(-50%);
-    background: var(--text); color: var(--chrome-2);
-    padding: 10px 18px; border-radius: 6px; font-size: 13px;
-    box-shadow: var(--shadow);
-    opacity: 0; pointer-events: none; transition: opacity .2s, transform .2s;
-    z-index: 200;
-  }
-  .toast.show { opacity: 1; transform: translateX(-50%) translateY(-6px); }
-
-  /* Scrollbars (subtle, Windows-like) */
-  ::-webkit-scrollbar { width: 14px; height: 14px; }
-  ::-webkit-scrollbar-thumb { background: transparent; border: 4px solid transparent; border-radius: 8px; background-clip: padding-box; }
-  *:hover::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.25); border: 4px solid transparent; background-clip: padding-box; }
+/* Scrollbars */
+::-webkit-scrollbar { width: 12px; }
+::-webkit-scrollbar-thumb {
+  background: transparent; border: 3px solid transparent;
+  border-radius: 8px; background-clip: padding-box;
+}
+*:hover > ::-webkit-scrollbar-thumb,
+.filearea::-webkit-scrollbar-thumb,
+.sidebar::-webkit-scrollbar-thumb {
+  background: rgba(0,0,0,0.18);
+  border: 3px solid transparent; background-clip: padding-box;
+}
 </style>
 </head>
 <body>
 
-<!-- ===================== Auth Overlay ===================== -->
+<!-- =================== AUTH SCREEN =================== -->
 <div id="auth-screen" class="auth-overlay">
   <div class="auth-card">
     <div class="brand">
@@ -537,6 +507,8 @@
     </div>
     <p class="subtitle">Sign in to access your secure documents</p>
 
+    <div id="auth-error" class="auth-error"></div>
+
     <label for="email">Email</label>
     <input type="email" id="email" placeholder="you@example.com" autocomplete="email" />
 
@@ -544,20 +516,30 @@
     <input type="password" id="password" placeholder="••••••••" autocomplete="current-password" />
 
     <div class="btn-row">
-      <button id="login-btn" class="primary">Sign in</button>
-      <button id="signup-btn">Create account</button>
+      <button class="auth-btn primary" id="login-btn">Sign in</button>
+      <button class="auth-btn" id="signup-btn">Create account</button>
     </div>
 
     <div class="divider">or</div>
 
-    <button id="google-btn" class="google">
-      <svg width="16" height="16" viewBox="0 0 18 18"><path d="M17.64 9.2c0-.63-.06-1.25-.16-1.84H9v3.47h4.84c-.21 1.12-.84 2.07-1.79 2.7l2.79 2.16c1.63-1.51 2.57-3.73 2.57-6.39z" fill="#4285F4"/><path d="M9 18c2.43 0 4.47-.8 5.96-2.18l-2.79-2.16c-.78.52-1.78.83-3.17.83-2.44 0-4.51-1.65-5.25-3.87H.83v2.2C2.32 15.8 5.4 18 9 18z" fill="#34A853"/><path d="M3.75 10.62c-.19-.57-.3-1.18-.3-1.82s.11-1.25.3-1.82V4.78H.83C.3 5.83 0 7.01 0 8.25s.3 2.42.83 3.47l2.92-2.1z" fill="#FBBC05"/><path d="M9 3.58c1.32 0 2.5.45 3.44 1.35l2.58-2.58C13.46.8 11.43 0 9 0 5.4 0 2.32 2.2 1.83 4.78l2.92 2.2c.74-2.22 2.81-3.87 5.25-3.87z" fill="#EA4335"/></svg>
+    <button id="google-btn" class="google-btn">
+      <svg width="16" height="16" viewBox="0 0 18 18">
+        <path d="M17.64 9.2c0-.63-.06-1.25-.16-1.84H9v3.47h4.84c-.21 1.12-.84 2.07-1.79 2.7l2.79 2.16c1.63-1.51 2.57-3.73 2.57-6.39z" fill="#4285F4"/>
+        <path d="M9 18c2.43 0 4.47-.8 5.96-2.18l-2.79-2.16c-.78.52-1.78.83-3.17.83-2.44 0-4.51-1.65-5.25-3.87H.83v2.2C2.32 15.8 5.4 18 9 18z" fill="#34A853"/>
+        <path d="M3.75 10.62c-.19-.57-.3-1.18-.3-1.82s.11-1.25.3-1.82V4.78H.83C.3 5.83 0 7.01 0 8.25s.3 2.42.83 3.47l2.92-2.1z" fill="#FBBC05"/>
+        <path d="M9 3.58c1.32 0 2.5.45 3.44 1.35l2.58-2.58C13.46.8 11.43 0 9 0 5.4 0 2.32 2.2 1.83 4.78l2.92 2.2c.74-2.22 2.81-3.87 5.25-3.87z" fill="#EA4335"/>
+      </svg>
       Continue with Google
     </button>
+
+    <div class="auth-toggle">
+      <span id="auth-switch-text">Don't have an account?</span>
+      <a id="auth-switch-link"> Sign up</a>
+    </div>
   </div>
 </div>
 
-<!-- ===================== File Explorer Window ===================== -->
+<!-- =================== DASHBOARD =================== -->
 <div id="dashboard-screen" class="window hidden">
 
   <!-- Title bar -->
@@ -570,7 +552,7 @@
     <div class="winbtns">
       <button title="Minimize">&#8211;</button>
       <button title="Maximize">&#9633;</button>
-      <button class="close" title="Close">&#10005;</button>
+      <button class="close-btn" title="Close">&#10005;</button>
     </div>
   </div>
 
@@ -580,7 +562,7 @@
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
       Upload
     </button>
-    <button class="cmd-btn" id="cmd-new-folder" disabled title="Coming soon">
+    <button class="cmd-btn" id="cmd-new-folder" title="Coming soon" disabled>
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/><line x1="12" y1="11" x2="12" y2="17"/><line x1="9" y1="14" x2="15" y2="14"/></svg>
       New folder
     </button>
@@ -593,11 +575,15 @@
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
       Download
     </button>
-    <div class="spacer" style="flex:1"></div>
+    <button class="cmd-btn" id="cmd-delete" disabled style="color:#ef4444">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+      Delete
+    </button>
+    <div style="flex:1"></div>
     <div id="user-chip" class="user-chip">
       <span class="avatar" id="user-avatar">?</span>
       <span id="user-display">user</span>
-      <button id="logout-btn" title="Sign out">Sign out</button>
+      <button class="signout" id="logout-btn">Sign out</button>
     </div>
   </div>
 
@@ -606,14 +592,14 @@
     <div class="nav-arrows">
       <button disabled title="Back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
       <button disabled title="Forward"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></button>
-      <button title="Up" disabled><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg></button>
+      <button disabled title="Up"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg></button>
     </div>
     <div class="crumbs">
       <span class="crumb">
         <svg viewBox="0 0 24 24" fill="currentColor"><path d="M10 4H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-8l-2-2z"/></svg>
         DigiLocker
       </span>
-      <span class="crumb-sep">&#10095;</span>
+      <span class="crumb-sep">›</span>
       <span class="crumb">My Documents</span>
     </div>
     <div class="searchbox">
@@ -622,7 +608,7 @@
     </div>
   </div>
 
-  <!-- Body: sidebar + main -->
+  <!-- Body -->
   <div class="body">
     <aside class="sidebar">
       <div class="side-group">
@@ -644,15 +630,25 @@
           Shared with me
         </div>
       </div>
-
       <div class="side-group">
         <div class="side-group-title">Categories</div>
-        <div class="side-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="12" cy="10" r="3"/><path d="M7 20v-2a4 4 0 0 1 4-4h2a4 4 0 0 1 4 4v2"/></svg>Identity</div>
-        <div class="side-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>Certificates</div>
-        <div class="side-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>Finance</div>
-        <div class="side-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>Property</div>
+        <div class="side-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="12" cy="10" r="3"/><path d="M7 20v-2a4 4 0 0 1 4-4h2a4 4 0 0 1 4 4v2"/></svg>
+          Identity
+        </div>
+        <div class="side-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+          Certificates
+        </div>
+        <div class="side-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+          Finance
+        </div>
+        <div class="side-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+          Property
+        </div>
       </div>
-
       <div class="side-group">
         <div class="side-group-title">This PC</div>
         <div class="side-item">
@@ -674,14 +670,12 @@
           </button>
         </div>
       </div>
-
       <div id="filearea" class="filearea">
-        <div class="empty-state" id="loading-state">
-          <div class="big-icon">📂</div>
-          <h3>Loading your documents…</h3>
+        <div class="empty-state">
+          <div class="spinner"></div>
+          <h3>Loading…</h3>
         </div>
       </div>
-
       <input type="file" id="file-picker" multiple hidden />
     </section>
   </div>
@@ -698,25 +692,36 @@
 
 <div id="toast" class="toast"></div>
 
-<!-- ===================== Firebase logic ===================== -->
+<!-- =================== FIREBASE LOGIC =================== -->
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
 import {
-  getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword,
-  signOut, onAuthStateChanged, GoogleAuthProvider, signInWithPopup
+  getAuth,
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
+  signOut,
+  onAuthStateChanged,
+  GoogleAuthProvider,
+  signInWithPopup
 } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 import {
-  getStorage, ref, uploadBytes, getDownloadURL, listAll, getMetadata, deleteObject
+  getStorage,
+  ref,
+  uploadBytes,
+  getDownloadURL,
+  listAll,
+  getMetadata,
+  deleteObject
 } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-storage.js";
 
+// ---- Firebase config ----
 const firebaseConfig = {
   apiKey: "AIzaSyC9rcG1bY2gmXqrfbSr07ZEW_8BRLnSs80",
   authDomain: "digilocker-ba691.firebaseapp.com",
   projectId: "digilocker-ba691",
   storageBucket: "digilocker-ba691.firebasestorage.app",
   messagingSenderId: "317145734229",
-  appId: "1:317145734229:web:22b692451eefda979b08dc",
-  measurementId: "G-T73SJP7KSY"
+  appId: "1:317145734229:web:22b692451eefda979b08dc"
 };
 
 const app = initializeApp(firebaseConfig);
@@ -724,114 +729,218 @@ const auth = getAuth(app);
 const storage = getStorage(app);
 const googleProvider = new GoogleAuthProvider();
 
-// ---------- DOM ----------
-const $ = (id) => document.getElementById(id);
-const authScreen = $('auth-screen');
-const dashboard = $('dashboard-screen');
-const emailInput = $('email');
+// ---- DOM helpers ----
+const $ = id => document.getElementById(id);
+
+const authScreen    = $('auth-screen');
+const dashboard     = $('dashboard-screen');
+const emailInput    = $('email');
 const passwordInput = $('password');
-const filearea = $('filearea');
-const filePicker = $('file-picker');
-const userDisplay = $('user-display');
-const userAvatar = $('user-avatar');
-const statusText = $('status-text');
-const itemCount = $('item-count');
-const selectedInfo = $('selected-info');
-const toast = $('toast');
-const searchInput = $('search-input');
+const filearea      = $('filearea');
+const filePicker    = $('file-picker');
+const userDisplay   = $('user-display');
+const userAvatar    = $('user-avatar');
+const statusText    = $('status-text');
+const itemCount     = $('item-count');
+const selectedInfo  = $('selected-info');
+const toast         = $('toast');
+const searchInput   = $('search-input');
+const authError     = $('auth-error');
 
 let currentView = 'grid';
 let allFiles = [];
 let selectedFiles = new Set();
+let isSignUpMode = false;
 
-// ---------- Helpers ----------
+// ---- Utilities ----
 function showToast(msg) {
   toast.textContent = msg;
   toast.classList.add('show');
   clearTimeout(showToast._t);
-  showToast._t = setTimeout(() => toast.classList.remove('show'), 2400);
+  showToast._t = setTimeout(() => toast.classList.remove('show'), 2800);
 }
+
+function showAuthError(msg) {
+  authError.textContent = msg;
+  authError.classList.add('show');
+}
+function clearAuthError() {
+  authError.textContent = '';
+  authError.classList.remove('show');
+}
+
+function setAuthLoading(loading) {
+  $('login-btn').disabled = loading;
+  $('signup-btn').disabled = loading;
+  $('google-btn').disabled = loading;
+  $('login-btn').textContent = loading && !isSignUpMode ? 'Signing in…' : (isSignUpMode ? 'Sign in' : 'Sign in');
+  $('signup-btn').textContent = loading && isSignUpMode ? 'Creating…' : (isSignUpMode ? 'Sign in' : 'Create account');
+}
+
 function formatBytes(bytes) {
   if (!bytes) return '—';
   const u = ['B','KB','MB','GB']; let i = 0;
-  while (bytes >= 1024 && i < u.length-1) { bytes /= 1024; i++; }
+  while (bytes >= 1024 && i < u.length - 1) { bytes /= 1024; i++; }
   return bytes.toFixed(i === 0 ? 0 : 1) + ' ' + u[i];
 }
+
 function formatDate(d) {
   if (!d) return '—';
-  const dt = new Date(d);
-  return dt.toLocaleDateString(undefined, { year:'numeric', month:'short', day:'numeric' }) +
-    ' ' + dt.toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' });
-}
-function getExt(name) {
-  const i = name.lastIndexOf('.');
-  return i >= 0 ? name.slice(i+1).toLowerCase() : '';
-}
-function fileTypeLabel(ext) {
-  const map = { pdf:'PDF Document', jpg:'JPEG Image', jpeg:'JPEG Image', png:'PNG Image',
-    gif:'GIF Image', webp:'WebP Image', doc:'Word Document', docx:'Word Document',
-    xls:'Excel Sheet', xlsx:'Excel Sheet', txt:'Text File', zip:'Compressed', mp4:'Video' };
-  return map[ext] || (ext ? ext.toUpperCase() + ' File' : 'File');
-}
-function fileIcon(ext) {
-  // Returns an SVG string for the icon
-  const colors = {
-    pdf: '#e53935', doc: '#1565c0', docx: '#1565c0',
-    xls: '#2e7d32', xlsx: '#2e7d32',
-    jpg: '#8e24aa', jpeg: '#8e24aa', png: '#8e24aa', gif: '#8e24aa', webp: '#8e24aa',
-    zip: '#f9a825', txt: '#616161', mp4: '#d81b60'
-  };
-  const color = colors[ext] || '#0067c0';
-  const label = (ext || 'FILE').toUpperCase().slice(0,4);
-  return `
-    <svg viewBox="0 0 64 80" xmlns="http://www.w3.org/2000/svg">
-      <defs>
-        <linearGradient id="g-${ext||'x'}" x1="0" x2="0" y1="0" y2="1">
-          <stop offset="0" stop-color="#ffffff"/>
-          <stop offset="1" stop-color="#eaeaea"/>
-        </linearGradient>
-      </defs>
-      <path d="M8 2 H40 L56 18 V74 a4 4 0 0 1-4 4 H8 a4 4 0 0 1-4-4 V6 a4 4 0 0 1 4-4 z"
-            fill="url(#g-${ext||'x'})" stroke="#bdbdbd" stroke-width="1"/>
-      <path d="M40 2 V18 H56 z" fill="#cfd8dc" stroke="#bdbdbd" stroke-width="1"/>
-      <rect x="4" y="44" width="44" height="20" rx="2" fill="${color}"/>
-      <text x="26" y="58" text-anchor="middle" fill="#fff"
-            font-family="Segoe UI, Arial, sans-serif" font-weight="700" font-size="11">${label}</text>
-    </svg>`;
+  return new Date(d).toLocaleDateString(undefined, { year:'numeric', month:'short', day:'numeric' })
+    + ' ' + new Date(d).toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' });
 }
 
-// ---------- Auth ----------
-onAuthStateChanged(auth, (user) => {
+function getExt(name) {
+  const i = name.lastIndexOf('.');
+  return i >= 0 ? name.slice(i + 1).toLowerCase() : '';
+}
+
+function fileTypeLabel(ext) {
+  const map = {
+    pdf:'PDF Document', jpg:'JPEG Image', jpeg:'JPEG Image', png:'PNG Image',
+    gif:'GIF Image', webp:'WebP Image', doc:'Word Document', docx:'Word Document',
+    xls:'Excel Sheet', xlsx:'Excel Sheet', txt:'Text File',
+    zip:'Compressed', mp4:'Video', mp3:'Audio'
+  };
+  return map[ext] || (ext ? ext.toUpperCase() + ' File' : 'File');
+}
+
+function fileIcon(ext) {
+  const colors = {
+    pdf:'#e53935', doc:'#1565c0', docx:'#1565c0',
+    xls:'#2e7d32', xlsx:'#2e7d32',
+    jpg:'#8e24aa', jpeg:'#8e24aa', png:'#8e24aa', gif:'#8e24aa', webp:'#8e24aa',
+    zip:'#f9a825', txt:'#616161', mp4:'#d81b60', mp3:'#00838f'
+  };
+  const color = colors[ext] || '#0067c0';
+  const label = (ext || 'FILE').toUpperCase().slice(0, 4);
+  const uid = `g${Math.random().toString(36).slice(2,6)}`;
+  return `<svg viewBox="0 0 64 80" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <linearGradient id="${uid}" x1="0" x2="0" y1="0" y2="1">
+        <stop offset="0" stop-color="#ffffff"/>
+        <stop offset="1" stop-color="#eaeaea"/>
+      </linearGradient>
+    </defs>
+    <path d="M8 2H40L56 18V74a4 4 0 0 1-4 4H8a4 4 0 0 1-4-4V6a4 4 0 0 1 4-4z" fill="url(#${uid})" stroke="#bdbdbd" stroke-width="1"/>
+    <path d="M40 2V18H56z" fill="#cfd8dc" stroke="#bdbdbd" stroke-width="1"/>
+    <rect x="4" y="44" width="48" height="22" rx="2" fill="${color}"/>
+    <text x="28" y="59" text-anchor="middle" fill="#fff" font-family="Segoe UI,Arial,sans-serif" font-weight="700" font-size="11">${label}</text>
+  </svg>`;
+}
+
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+}
+
+// ---- Auth UI mode toggle ----
+function updateAuthMode() {
+  $('login-btn').textContent  = isSignUpMode ? 'Sign in'        : 'Sign in';
+  $('signup-btn').textContent = isSignUpMode ? 'Create account' : 'Create account';
+  $('auth-switch-text').textContent  = isSignUpMode ? 'Already have an account?' : "Don't have an account?";
+  $('auth-switch-link').textContent  = isSignUpMode ? ' Sign in' : ' Sign up';
+}
+
+$('auth-switch-link').addEventListener('click', () => {
+  isSignUpMode = !isSignUpMode;
+  clearAuthError();
+  updateAuthMode();
+});
+
+// ---- Auth handlers ----
+$('login-btn').addEventListener('click', async () => {
+  clearAuthError();
+  const email = emailInput.value.trim();
+  const pass  = passwordInput.value;
+  if (!email || !pass) { showAuthError('Please enter your email and password.'); return; }
+  setAuthLoading(true);
+  try {
+    await signInWithEmailAndPassword(auth, email, pass);
+  } catch (e) {
+    showAuthError(friendlyError(e.code));
+  } finally {
+    setAuthLoading(false);
+  }
+});
+
+$('signup-btn').addEventListener('click', async () => {
+  clearAuthError();
+  const email = emailInput.value.trim();
+  const pass  = passwordInput.value;
+  if (!email || !pass) { showAuthError('Please enter your email and password.'); return; }
+  if (pass.length < 6) { showAuthError('Password must be at least 6 characters.'); return; }
+  setAuthLoading(true);
+  try {
+    await createUserWithEmailAndPassword(auth, email, pass);
+    showToast('Account created! Welcome 🎉');
+  } catch (e) {
+    showAuthError(friendlyError(e.code));
+  } finally {
+    setAuthLoading(false);
+  }
+});
+
+$('google-btn').addEventListener('click', async () => {
+  clearAuthError();
+  try {
+    await signInWithPopup(auth, googleProvider);
+  } catch (e) {
+    if (e.code !== 'auth/popup-closed-by-user') showAuthError(friendlyError(e.code));
+  }
+});
+
+$('logout-btn').addEventListener('click', async () => {
+  await signOut(auth);
+  showToast('Signed out. See ya! 👋');
+});
+
+function friendlyError(code) {
+  const map = {
+    'auth/invalid-email':           'That doesn\'t look like a valid email address.',
+    'auth/user-not-found':          'No account found with that email.',
+    'auth/wrong-password':          'Incorrect password. Please try again.',
+    'auth/invalid-credential':      'Incorrect email or password. Please try again.',
+    'auth/email-already-in-use':    'An account with that email already exists.',
+    'auth/weak-password':           'Password should be at least 6 characters.',
+    'auth/too-many-requests':       'Too many attempts. Please try again later.',
+    'auth/network-request-failed':  'Network error. Check your connection.',
+  };
+  return map[code] || 'Something went wrong. Please try again.';
+}
+
+// Enter key on auth inputs
+[emailInput, passwordInput].forEach(el => {
+  el.addEventListener('keydown', e => { if (e.key === 'Enter') $('login-btn').click(); });
+});
+
+// ---- Auth state listener ----
+onAuthStateChanged(auth, user => {
   if (user) {
     authScreen.classList.add('hidden');
     dashboard.classList.remove('hidden');
     const name = user.displayName || user.email || 'user';
     userDisplay.textContent = name;
-    userAvatar.textContent = (name[0] || '?').toUpperCase();
+    userAvatar.textContent  = (name[0] || '?').toUpperCase();
     loadDocuments(user.uid);
   } else {
     authScreen.classList.remove('hidden');
     dashboard.classList.add('hidden');
-    allFiles = []; selectedFiles.clear();
+    allFiles = [];
+    selectedFiles.clear();
   }
 });
 
-$('google-btn').addEventListener('click', () =>
-  signInWithPopup(auth, googleProvider).catch(e => showToast(e.message)));
-$('login-btn').addEventListener('click', () =>
-  signInWithEmailAndPassword(auth, emailInput.value, passwordInput.value).catch(e => showToast(e.message)));
-$('signup-btn').addEventListener('click', () =>
-  createUserWithEmailAndPassword(auth, emailInput.value, passwordInput.value).catch(e => showToast(e.message)));
-$('logout-btn').addEventListener('click', () => signOut(auth));
-
-// ---------- Upload ----------
+// ---- Upload ----
 $('cmd-upload').addEventListener('click', () => filePicker.click());
-filePicker.addEventListener('change', () => handleFiles(filePicker.files));
+
+filePicker.addEventListener('change', () => {
+  if (filePicker.files.length) handleFiles(filePicker.files);
+});
 
 // Drag & drop
-filearea.addEventListener('dragover', (e) => { e.preventDefault(); filearea.classList.add('drag-over'); });
+filearea.addEventListener('dragover', e => { e.preventDefault(); filearea.classList.add('drag-over'); });
 filearea.addEventListener('dragleave', () => filearea.classList.remove('drag-over'));
-filearea.addEventListener('drop', (e) => {
+filearea.addEventListener('drop', e => {
   e.preventDefault(); filearea.classList.remove('drag-over');
   handleFiles(e.dataTransfer.files);
 });
@@ -840,28 +949,56 @@ async function handleFiles(fileList) {
   const user = auth.currentUser;
   if (!user || !fileList || fileList.length === 0) return;
   const files = Array.from(fileList);
-  statusText.textContent = `Uploading ${files.length} file${files.length>1?'s':''}…`;
+  statusText.textContent = `Uploading ${files.length} file${files.length > 1 ? 's' : ''}…`;
   try {
     for (const file of files) {
       const r = ref(storage, `users/${user.uid}/${file.name}`);
       await uploadBytes(r, file);
     }
-    showToast(`Uploaded ${files.length} file${files.length>1?'s':''}`);
+    showToast(`✅ Uploaded ${files.length} file${files.length > 1 ? 's' : ''}!`);
     statusText.textContent = 'Upload complete';
     filePicker.value = '';
     loadDocuments(user.uid);
   } catch (err) {
-    showToast(err.message);
+    showToast('❌ ' + err.message);
     statusText.textContent = 'Upload failed';
   }
 }
 
-// ---------- Refresh ----------
+// ---- Refresh ----
 $('cmd-refresh').addEventListener('click', () => {
   if (auth.currentUser) loadDocuments(auth.currentUser.uid);
 });
 
-// ---------- View toggle ----------
+// ---- Download ----
+$('cmd-download').addEventListener('click', () => {
+  selectedFiles.forEach(name => {
+    const f = allFiles.find(x => x.name === name);
+    if (f?.url) window.open(f.url, '_blank');
+  });
+});
+
+// ---- Delete ----
+$('cmd-delete').addEventListener('click', async () => {
+  if (selectedFiles.size === 0) return;
+  const names = [...selectedFiles];
+  const confirm = window.confirm(`Delete ${names.length} file${names.length > 1 ? 's' : ''}? This cannot be undone.`);
+  if (!confirm) return;
+  statusText.textContent = 'Deleting…';
+  try {
+    for (const name of names) {
+      const f = allFiles.find(x => x.name === name);
+      if (f?.ref) await deleteObject(f.ref);
+    }
+    showToast(`🗑️ Deleted ${names.length} file${names.length > 1 ? 's' : ''}`);
+    loadDocuments(auth.currentUser.uid);
+  } catch (err) {
+    showToast('❌ ' + err.message);
+    statusText.textContent = 'Delete failed';
+  }
+});
+
+// ---- View toggle ----
 document.querySelectorAll('.view-toggle button').forEach(btn => {
   btn.addEventListener('click', () => {
     document.querySelectorAll('.view-toggle button').forEach(b => b.classList.remove('active'));
@@ -871,59 +1008,67 @@ document.querySelectorAll('.view-toggle button').forEach(btn => {
   });
 });
 
-// ---------- Search ----------
+// ---- Search ----
 searchInput.addEventListener('input', render);
 
-// ---------- Download selected ----------
-$('cmd-download').addEventListener('click', () => {
-  selectedFiles.forEach(name => {
-    const f = allFiles.find(x => x.name === name);
-    if (f) window.open(f.url, '_blank');
-  });
-});
-
-// ---------- Load ----------
+// ---- Load documents ----
 async function loadDocuments(uid) {
-  filearea.innerHTML = `<div class="empty-state"><div class="big-icon">📂</div><h3>Loading your documents…</h3></div>`;
+  filearea.innerHTML = `<div class="empty-state"><div class="spinner"></div><h3>Loading your documents…</h3></div>`;
   statusText.textContent = 'Loading…';
   try {
     const listRef = ref(storage, `users/${uid}`);
     const res = await listAll(listRef);
-    const files = await Promise.all(res.items.map(async (itemRef) => {
+    const files = await Promise.all(res.items.map(async itemRef => {
       const [url, meta] = await Promise.all([
         getDownloadURL(itemRef).catch(() => null),
         getMetadata(itemRef).catch(() => ({}))
       ]);
       return {
-        name: itemRef.name, url,
+        name: itemRef.name,
+        url,
         size: meta.size || 0,
         updated: meta.updated || meta.timeCreated,
         ext: getExt(itemRef.name),
         ref: itemRef
       };
     }));
-    allFiles = files.sort((a,b) => a.name.localeCompare(b.name));
+    allFiles = files.sort((a, b) => a.name.localeCompare(b.name));
     selectedFiles.clear();
     render();
     statusText.textContent = 'Ready';
   } catch (err) {
-    filearea.innerHTML = `<div class="empty-state"><div class="big-icon">⚠️</div><h3>Couldn't load files</h3><p>${err.message}</p></div>`;
+    filearea.innerHTML = `<div class="empty-state"><div class="big-icon">⚠️</div><h3>Couldn't load files</h3><p>${escapeHtml(err.message)}</p></div>`;
     statusText.textContent = 'Error';
   }
 }
 
+// ---- Render ----
 function render() {
   const q = (searchInput.value || '').toLowerCase().trim();
   const files = q ? allFiles.filter(f => f.name.toLowerCase().includes(q)) : allFiles;
   itemCount.textContent = `${files.length} item${files.length === 1 ? '' : 's'}`;
 
   if (files.length === 0) {
-    filearea.innerHTML = `
-      <div class="empty-state">
-        <div class="big-icon">${q ? '🔍' : '📁'}</div>
-        <h3>${q ? 'No matches' : 'This folder is empty'}</h3>
-        <p>${q ? 'Try a different search term.' : 'Drop files here or click Upload to add documents.'}</p>
-      </div>`;
+    if (q) {
+      filearea.innerHTML = `
+        <div class="empty-state">
+          <div class="big-icon">🔍</div>
+          <h3>No matches</h3>
+          <p>Try a different search term.</p>
+        </div>`;
+    } else {
+      filearea.innerHTML = `
+        <div class="empty-state">
+          <div class="big-icon">📁</div>
+          <h3>This folder is empty</h3>
+          <p>Drop files here or click the button below to get started.</p>
+          <button class="empty-upload-btn" id="empty-upload-btn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            Upload your first file
+          </button>
+        </div>`;
+      document.getElementById('empty-upload-btn').addEventListener('click', () => filePicker.click());
+    }
     updateSelection();
     return;
   }
@@ -931,9 +1076,9 @@ function render() {
   if (currentView === 'grid') {
     filearea.innerHTML = `<div class="files-grid">${
       files.map(f => `
-        <div class="file-card${selectedFiles.has(f.name)?' selected':''}" data-name="${escapeAttr(f.name)}">
+        <div class="file-card${selectedFiles.has(f.name) ? ' selected' : ''}" data-name="${escapeHtml(f.name)}">
           <div class="icon">${fileIcon(f.ext)}</div>
-          <div class="name" title="${escapeAttr(f.name)}">${escapeHtml(f.name)}</div>
+          <div class="name" title="${escapeHtml(f.name)}">${escapeHtml(f.name)}</div>
         </div>`).join('')
     }</div>`;
   } else {
@@ -943,10 +1088,10 @@ function render() {
           <div>Name</div><div>Date modified</div><div>Type</div><div>Size</div>
         </div>
         ${files.map(f => `
-          <div class="row${selectedFiles.has(f.name)?' selected':''}" data-name="${escapeAttr(f.name)}">
+          <div class="row${selectedFiles.has(f.name) ? ' selected' : ''}" data-name="${escapeHtml(f.name)}">
             <div class="name-cell">
               ${fileIcon(f.ext)}
-              <span title="${escapeAttr(f.name)}">${escapeHtml(f.name)}</span>
+              <span title="${escapeHtml(f.name)}">${escapeHtml(f.name)}</span>
             </div>
             <div>${formatDate(f.updated)}</div>
             <div>${fileTypeLabel(f.ext)}</div>
@@ -955,14 +1100,15 @@ function render() {
       </div>`;
   }
 
-  // Bind interactions
+  // Bind click / double-click
   filearea.querySelectorAll('[data-name]').forEach(el => {
-    el.addEventListener('click', (e) => {
+    el.addEventListener('click', e => {
       const name = el.dataset.name;
       if (e.ctrlKey || e.metaKey) {
         selectedFiles.has(name) ? selectedFiles.delete(name) : selectedFiles.add(name);
       } else {
-        selectedFiles.clear(); selectedFiles.add(name);
+        selectedFiles.clear();
+        selectedFiles.add(name);
       }
       render();
     });
@@ -971,21 +1117,16 @@ function render() {
       if (f?.url) window.open(f.url, '_blank');
     });
   });
+
   updateSelection();
 }
 
 function updateSelection() {
   const n = selectedFiles.size;
   $('cmd-download').disabled = n === 0;
-  selectedInfo.textContent = n > 0 ? `${n} selected` : '';
+  $('cmd-delete').disabled   = n === 0;
+  selectedInfo.textContent   = n > 0 ? `${n} selected` : '';
 }
-
-function escapeHtml(s){return s.replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));}
-function escapeAttr(s){return escapeHtml(s);}
-
-// Enter to sign in
-[emailInput, passwordInput].forEach(i =>
-  i.addEventListener('keydown', e => { if (e.key === 'Enter') $('login-btn').click(); }));
 </script>
 </body>
 </html>
