@@ -685,7 +685,7 @@ body {
     <span id="status-text">Ready</span>
     <div class="right">
       <span id="selected-info"></span>
-      <span>DigiLocker · Secured by Firebase</span>
+      <span>DigiLocker · powered by Supabase ⚡</span>
     </div>
   </div>
 </div>
@@ -694,40 +694,14 @@ body {
 
 <!-- =================== FIREBASE LOGIC =================== -->
 <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-import {
-  getAuth,
-  signInWithEmailAndPassword,
-  createUserWithEmailAndPassword,
-  signOut,
-  onAuthStateChanged,
-  GoogleAuthProvider,
-  signInWithPopup
-} from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-import {
-  getStorage,
-  ref,
-  uploadBytes,
-  getDownloadURL,
-  listAll,
-  getMetadata,
-  deleteObject
-} from "https://www.gstatic.com/firebasejs/10.8.0/firebase-storage.js";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
-// ---- Firebase config ----
-const firebaseConfig = {
-  apiKey: "AIzaSyC9rcG1bY2gmXqrfbSr07ZEW_8BRLnSs80",
-  authDomain: "digilocker-ba691.firebaseapp.com",
-  projectId: "digilocker-ba691",
-  storageBucket: "digilocker-ba691.firebasestorage.app",
-  messagingSenderId: "317145734229",
-  appId: "1:317145734229:web:22b692451eefda979b08dc"
-};
+// ---- Supabase config ----
+const SUPABASE_URL    = "https://edvrzshtnralwsvlgbzo.supabase.co";
+const SUPABASE_ANON   = "sb_publishable_iRsFPQktJ9G6i6FPQSFewA_139c0SeP";
+const BUCKET          = "documents";
 
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const storage = getStorage(app);
-const googleProvider = new GoogleAuthProvider();
+const supabase = createClient(SUPABASE_URL, SUPABASE_ANON);
 
 // ---- DOM helpers ----
 const $ = id => document.getElementById(id);
@@ -835,8 +809,8 @@ function escapeHtml(s) {
 
 // ---- Auth UI mode toggle ----
 function updateAuthMode() {
-  $('login-btn').textContent  = isSignUpMode ? 'Sign in'        : 'Sign in';
-  $('signup-btn').textContent = isSignUpMode ? 'Create account' : 'Create account';
+  $('login-btn').textContent         = isSignUpMode ? 'Sign in'        : 'Sign in';
+  $('signup-btn').textContent        = isSignUpMode ? 'Create account' : 'Create account';
   $('auth-switch-text').textContent  = isSignUpMode ? 'Already have an account?' : "Don't have an account?";
   $('auth-switch-link').textContent  = isSignUpMode ? ' Sign in' : ' Sign up';
 }
@@ -852,76 +826,65 @@ $('login-btn').addEventListener('click', async () => {
   clearAuthError();
   const email = emailInput.value.trim();
   const pass  = passwordInput.value;
-  if (!email || !pass) { showAuthError('Please enter your email and password.'); return; }
+  if (!email || !pass) { showAuthError('please enter your email and password.'); return; }
   setAuthLoading(true);
-  try {
-    await signInWithEmailAndPassword(auth, email, pass);
-  } catch (e) {
-    showAuthError(friendlyError(e.code));
-  } finally {
-    setAuthLoading(false);
-  }
+  const { error } = await supabase.auth.signInWithPassword({ email, password: pass });
+  if (error) showAuthError(friendlyError(error.message));
+  setAuthLoading(false);
 });
 
 $('signup-btn').addEventListener('click', async () => {
   clearAuthError();
   const email = emailInput.value.trim();
   const pass  = passwordInput.value;
-  if (!email || !pass) { showAuthError('Please enter your email and password.'); return; }
-  if (pass.length < 6) { showAuthError('Password must be at least 6 characters.'); return; }
+  if (!email || !pass) { showAuthError('please enter your email and password.'); return; }
+  if (pass.length < 6) { showAuthError('password must be at least 6 characters.'); return; }
   setAuthLoading(true);
-  try {
-    await createUserWithEmailAndPassword(auth, email, pass);
-    showToast('Account created! Welcome 🎉');
-  } catch (e) {
-    showAuthError(friendlyError(e.code));
-  } finally {
-    setAuthLoading(false);
-  }
+  const { error } = await supabase.auth.signUp({ email, password: pass });
+  if (error) showAuthError(friendlyError(error.message));
+  else showToast('✅ account created! check your email to confirm, then sign in.');
+  setAuthLoading(false);
 });
 
 $('google-btn').addEventListener('click', async () => {
   clearAuthError();
-  try {
-    await signInWithPopup(auth, googleProvider);
-  } catch (e) {
-    if (e.code !== 'auth/popup-closed-by-user') showAuthError(friendlyError(e.code));
-  }
+  const { error } = await supabase.auth.signInWithOAuth({
+    provider: 'google',
+    options: { redirectTo: window.location.href }
+  });
+  if (error) showAuthError(friendlyError(error.message));
 });
 
 $('logout-btn').addEventListener('click', async () => {
-  await signOut(auth);
-  showToast('Signed out. See ya! 👋');
+  await supabase.auth.signOut();
+  showToast('signed out. see ya! 👋');
 });
 
-function friendlyError(code) {
-  const map = {
-    'auth/invalid-email':           'That doesn\'t look like a valid email address.',
-    'auth/user-not-found':          'No account found with that email.',
-    'auth/wrong-password':          'Incorrect password. Please try again.',
-    'auth/invalid-credential':      'Incorrect email or password. Please try again.',
-    'auth/email-already-in-use':    'An account with that email already exists.',
-    'auth/weak-password':           'Password should be at least 6 characters.',
-    'auth/too-many-requests':       'Too many attempts. Please try again later.',
-    'auth/network-request-failed':  'Network error. Check your connection.',
-  };
-  return map[code] || 'Something went wrong. Please try again.';
+function friendlyError(msg) {
+  if (!msg) return 'something went wrong. please try again.';
+  const m = msg.toLowerCase();
+  if (m.includes('invalid login') || m.includes('invalid credentials')) return 'incorrect email or password.';
+  if (m.includes('email not confirmed')) return 'please confirm your email first — check your inbox!';
+  if (m.includes('already registered') || m.includes('already exists')) return 'an account with that email already exists.';
+  if (m.includes('password')) return 'password should be at least 6 characters.';
+  if (m.includes('rate limit')) return 'too many attempts. please wait a moment.';
+  if (m.includes('network') || m.includes('fetch')) return 'network error. check your connection.';
+  return msg;
 }
 
-// Enter key on auth inputs
-[emailInput, passwordInput].forEach(el => {
-  el.addEventListener('keydown', e => { if (e.key === 'Enter') $('login-btn').click(); });
-});
+[emailInput, passwordInput].forEach(el =>
+  el.addEventListener('keydown', e => { if (e.key === 'Enter') $('login-btn').click(); }));
 
-// ---- Auth state listener ----
-onAuthStateChanged(auth, user => {
+// ---- Session listener ----
+supabase.auth.onAuthStateChange((_event, session) => {
+  const user = session?.user ?? null;
   if (user) {
     authScreen.classList.add('hidden');
     dashboard.classList.remove('hidden');
-    const name = user.displayName || user.email || 'user';
+    const name = user.user_metadata?.full_name || user.email || 'user';
     userDisplay.textContent = name;
     userAvatar.textContent  = (name[0] || '?').toUpperCase();
-    loadDocuments(user.uid);
+    loadDocuments(user.id);
   } else {
     authScreen.classList.remove('hidden');
     dashboard.classList.add('hidden');
@@ -932,12 +895,8 @@ onAuthStateChanged(auth, user => {
 
 // ---- Upload ----
 $('cmd-upload').addEventListener('click', () => filePicker.click());
+filePicker.addEventListener('change', () => { if (filePicker.files.length) handleFiles(filePicker.files); });
 
-filePicker.addEventListener('change', () => {
-  if (filePicker.files.length) handleFiles(filePicker.files);
-});
-
-// Drag & drop
 filearea.addEventListener('dragover', e => { e.preventDefault(); filearea.classList.add('drag-over'); });
 filearea.addEventListener('dragleave', () => filearea.classList.remove('drag-over'));
 filearea.addEventListener('drop', e => {
@@ -946,28 +905,27 @@ filearea.addEventListener('drop', e => {
 });
 
 async function handleFiles(fileList) {
-  const user = auth.currentUser;
-  if (!user || !fileList || fileList.length === 0) return;
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user || !fileList?.length) return;
   const files = Array.from(fileList);
-  statusText.textContent = `Uploading ${files.length} file${files.length > 1 ? 's' : ''}…`;
-  try {
-    for (const file of files) {
-      const r = ref(storage, `users/${user.uid}/${file.name}`);
-      await uploadBytes(r, file);
-    }
-    showToast(`✅ Uploaded ${files.length} file${files.length > 1 ? 's' : ''}!`);
-    statusText.textContent = 'Upload complete';
-    filePicker.value = '';
-    loadDocuments(user.uid);
-  } catch (err) {
-    showToast('❌ ' + err.message);
-    statusText.textContent = 'Upload failed';
+  statusText.textContent = `uploading ${files.length} file${files.length > 1 ? 's' : ''}…`;
+  let failed = 0;
+  for (const file of files) {
+    const path = `${user.id}/${file.name}`;
+    const { error } = await supabase.storage.from(BUCKET).upload(path, file, { upsert: true });
+    if (error) { failed++; console.error(error); }
   }
+  filePicker.value = '';
+  if (failed) showToast(`⚠️ ${failed} file(s) failed to upload`);
+  else showToast(`✅ uploaded ${files.length} file${files.length > 1 ? 's' : ''}!`);
+  statusText.textContent = failed ? 'upload had errors' : 'upload complete';
+  loadDocuments(user.id);
 }
 
 // ---- Refresh ----
-$('cmd-refresh').addEventListener('click', () => {
-  if (auth.currentUser) loadDocuments(auth.currentUser.uid);
+$('cmd-refresh').addEventListener('click', async () => {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (user) loadDocuments(user.id);
 });
 
 // ---- Download ----
@@ -980,22 +938,17 @@ $('cmd-download').addEventListener('click', () => {
 
 // ---- Delete ----
 $('cmd-delete').addEventListener('click', async () => {
-  if (selectedFiles.size === 0) return;
+  if (!selectedFiles.size) return;
   const names = [...selectedFiles];
-  const confirm = window.confirm(`Delete ${names.length} file${names.length > 1 ? 's' : ''}? This cannot be undone.`);
-  if (!confirm) return;
-  statusText.textContent = 'Deleting…';
-  try {
-    for (const name of names) {
-      const f = allFiles.find(x => x.name === name);
-      if (f?.ref) await deleteObject(f.ref);
-    }
-    showToast(`🗑️ Deleted ${names.length} file${names.length > 1 ? 's' : ''}`);
-    loadDocuments(auth.currentUser.uid);
-  } catch (err) {
-    showToast('❌ ' + err.message);
-    statusText.textContent = 'Delete failed';
-  }
+  if (!window.confirm(`delete ${names.length} file${names.length > 1 ? 's' : ''}? this cannot be undone.`)) return;
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return;
+  statusText.textContent = 'deleting…';
+  const paths = names.map(n => `${user.id}/${n}`);
+  const { error } = await supabase.storage.from(BUCKET).remove(paths);
+  if (error) { showToast('❌ ' + error.message); statusText.textContent = 'delete failed'; return; }
+  showToast(`🗑️ deleted ${names.length} file${names.length > 1 ? 's' : ''}`);
+  loadDocuments(user.id);
 });
 
 // ---- View toggle ----
@@ -1008,38 +961,33 @@ document.querySelectorAll('.view-toggle button').forEach(btn => {
   });
 });
 
-// ---- Search ----
 searchInput.addEventListener('input', render);
 
 // ---- Load documents ----
 async function loadDocuments(uid) {
-  filearea.innerHTML = `<div class="empty-state"><div class="spinner"></div><h3>Loading your documents…</h3></div>`;
-  statusText.textContent = 'Loading…';
-  try {
-    const listRef = ref(storage, `users/${uid}`);
-    const res = await listAll(listRef);
-    const files = await Promise.all(res.items.map(async itemRef => {
-      const [url, meta] = await Promise.all([
-        getDownloadURL(itemRef).catch(() => null),
-        getMetadata(itemRef).catch(() => ({}))
-      ]);
-      return {
-        name: itemRef.name,
-        url,
-        size: meta.size || 0,
-        updated: meta.updated || meta.timeCreated,
-        ext: getExt(itemRef.name),
-        ref: itemRef
-      };
-    }));
-    allFiles = files.sort((a, b) => a.name.localeCompare(b.name));
-    selectedFiles.clear();
-    render();
-    statusText.textContent = 'Ready';
-  } catch (err) {
-    filearea.innerHTML = `<div class="empty-state"><div class="big-icon">⚠️</div><h3>Couldn't load files</h3><p>${escapeHtml(err.message)}</p></div>`;
-    statusText.textContent = 'Error';
+  filearea.innerHTML = `<div class="empty-state"><div class="spinner"></div><h3>loading your documents…</h3></div>`;
+  statusText.textContent = 'loading…';
+  const { data, error } = await supabase.storage.from(BUCKET).list(uid, { limit: 500, sortBy: { column: 'name', order: 'asc' } });
+  if (error) {
+    filearea.innerHTML = `<div class="empty-state"><div class="big-icon">⚠️</div><h3>couldn't load files</h3><p>${escapeHtml(error.message)}</p></div>`;
+    statusText.textContent = 'error'; return;
   }
+  allFiles = (data || [])
+    .filter(f => f.name !== '.emptyFolderPlaceholder')
+    .map(f => {
+      const { data: { publicUrl } } = supabase.storage.from(BUCKET).getPublicUrl(`${uid}/${f.name}`);
+      return {
+        name: f.name,
+        url: publicUrl,
+        size: f.metadata?.size || 0,
+        updated: f.updated_at || f.created_at,
+        ext: getExt(f.name),
+        path: `${uid}/${f.name}`
+      };
+    });
+  selectedFiles.clear();
+  render();
+  statusText.textContent = 'ready';
 }
 
 // ---- Render ----
@@ -1049,67 +997,46 @@ function render() {
   itemCount.textContent = `${files.length} item${files.length === 1 ? '' : 's'}`;
 
   if (files.length === 0) {
-    if (q) {
-      filearea.innerHTML = `
-        <div class="empty-state">
-          <div class="big-icon">🔍</div>
-          <h3>No matches</h3>
-          <p>Try a different search term.</p>
-        </div>`;
-    } else {
-      filearea.innerHTML = `
-        <div class="empty-state">
-          <div class="big-icon">📁</div>
-          <h3>This folder is empty</h3>
-          <p>Drop files here or click the button below to get started.</p>
-          <button class="empty-upload-btn" id="empty-upload-btn">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-            Upload your first file
-          </button>
-        </div>`;
-      document.getElementById('empty-upload-btn').addEventListener('click', () => filePicker.click());
-    }
-    updateSelection();
-    return;
+    filearea.innerHTML = q
+      ? `<div class="empty-state"><div class="big-icon">🔍</div><h3>no matches</h3><p>try a different search term.</p></div>`
+      : `<div class="empty-state">
+           <div class="big-icon">📁</div>
+           <h3>this folder is empty</h3>
+           <p>drop files here or click the button below to get started.</p>
+           <button class="empty-upload-btn" id="empty-upload-btn">
+             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+             upload your first file
+           </button>
+         </div>`;
+    if (!q) document.getElementById('empty-upload-btn')?.addEventListener('click', () => filePicker.click());
+    updateSelection(); return;
   }
 
   if (currentView === 'grid') {
-    filearea.innerHTML = `<div class="files-grid">${
-      files.map(f => `
-        <div class="file-card${selectedFiles.has(f.name) ? ' selected' : ''}" data-name="${escapeHtml(f.name)}">
-          <div class="icon">${fileIcon(f.ext)}</div>
-          <div class="name" title="${escapeHtml(f.name)}">${escapeHtml(f.name)}</div>
-        </div>`).join('')
-    }</div>`;
+    filearea.innerHTML = `<div class="files-grid">${files.map(f => `
+      <div class="file-card${selectedFiles.has(f.name) ? ' selected' : ''}" data-name="${escapeHtml(f.name)}">
+        <div class="icon">${fileIcon(f.ext)}</div>
+        <div class="name" title="${escapeHtml(f.name)}">${escapeHtml(f.name)}</div>
+      </div>`).join('')}</div>`;
   } else {
-    filearea.innerHTML = `
-      <div class="files-list">
-        <div class="row-head">
-          <div>Name</div><div>Date modified</div><div>Type</div><div>Size</div>
-        </div>
-        ${files.map(f => `
-          <div class="row${selectedFiles.has(f.name) ? ' selected' : ''}" data-name="${escapeHtml(f.name)}">
-            <div class="name-cell">
-              ${fileIcon(f.ext)}
-              <span title="${escapeHtml(f.name)}">${escapeHtml(f.name)}</span>
-            </div>
-            <div>${formatDate(f.updated)}</div>
-            <div>${fileTypeLabel(f.ext)}</div>
-            <div>${formatBytes(f.size)}</div>
-          </div>`).join('')}
-      </div>`;
+    filearea.innerHTML = `<div class="files-list">
+      <div class="row-head"><div>name</div><div>date modified</div><div>type</div><div>size</div></div>
+      ${files.map(f => `
+        <div class="row${selectedFiles.has(f.name) ? ' selected' : ''}" data-name="${escapeHtml(f.name)}">
+          <div class="name-cell">${fileIcon(f.ext)}<span title="${escapeHtml(f.name)}">${escapeHtml(f.name)}</span></div>
+          <div>${formatDate(f.updated)}</div>
+          <div>${fileTypeLabel(f.ext)}</div>
+          <div>${formatBytes(f.size)}</div>
+        </div>`).join('')}
+    </div>`;
   }
 
-  // Bind click / double-click
   filearea.querySelectorAll('[data-name]').forEach(el => {
     el.addEventListener('click', e => {
       const name = el.dataset.name;
       if (e.ctrlKey || e.metaKey) {
         selectedFiles.has(name) ? selectedFiles.delete(name) : selectedFiles.add(name);
-      } else {
-        selectedFiles.clear();
-        selectedFiles.add(name);
-      }
+      } else { selectedFiles.clear(); selectedFiles.add(name); }
       render();
     });
     el.addEventListener('dblclick', () => {
@@ -1117,7 +1044,6 @@ function render() {
       if (f?.url) window.open(f.url, '_blank');
     });
   });
-
   updateSelection();
 }
 
