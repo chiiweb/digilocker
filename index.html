@@ -1,9 +1,8 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
 <title>DigiLocker — File Explorer</title>
 <meta name="description" content="Your personal DigiLocker — securely store, access and share documents." />
 
@@ -263,6 +262,7 @@ body {
   padding: 8px 14px;
   background: var(--chrome-2);
   border-bottom: 1px solid var(--border);
+  flex-wrap: wrap;
 }
 .cmd-btn {
   display: inline-flex; align-items: center; gap: 7px;
@@ -288,6 +288,7 @@ body {
   display: flex; align-items: center; gap: 8px;
   padding: 6px 12px;
   background: var(--chrome-2); border-bottom: 1px solid var(--border);
+  flex-wrap: wrap;
 }
 .nav-arrows { display: flex; gap: 2px; }
 .nav-arrows button {
@@ -355,6 +356,7 @@ body {
   display: flex; align-items: center; gap: 6px;
   padding: 6px 14px; border-bottom: 1px solid var(--border);
   background: var(--chrome-2); font-size: 12px; color: var(--text-muted);
+  flex-wrap: wrap;
 }
 .view-toggle { display: flex; gap: 2px; margin-left: auto; }
 .view-toggle button {
@@ -443,10 +445,10 @@ body {
   border-top: 1px solid var(--border); background: var(--chrome-2);
   padding: 4px 14px; display: flex; align-items: center; gap: 16px;
   font-size: 12px; color: var(--text-muted);
+  flex-wrap: wrap;
 }
-.statusbar .right { margin-left: auto; display: flex; align-items: center; gap: 12px; }
+.statusbar .right { margin-left: auto; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
 
-/* User chip */
 .user-chip {
   display: inline-flex; align-items: center; gap: 8px;
   padding: 4px 10px 4px 4px; border-radius: 20px;
@@ -465,7 +467,6 @@ body {
 }
 .user-chip .signout:hover { color: #e81123; }
 
-/* Toast */
 .toast {
   position: fixed; bottom: 40px; left: 50%; transform: translateX(-50%) translateY(8px);
   background: var(--text); color: var(--panel);
@@ -475,7 +476,6 @@ body {
 }
 .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
-/* Loading spinner */
 .spinner {
   width: 36px; height: 36px; margin: 0 auto 16px;
   border: 3px solid var(--border); border-top-color: var(--accent);
@@ -483,7 +483,6 @@ body {
 }
 @keyframes spin { to { transform: rotate(360deg); } }
 
-/* Scrollbars */
 ::-webkit-scrollbar { width: 12px; }
 ::-webkit-scrollbar-thumb {
   background: transparent; border: 3px solid transparent;
@@ -495,565 +494,122 @@ body {
   background: rgba(0,0,0,0.18);
   border: 3px solid transparent; background-clip: padding-box;
 }
+
+@media (max-width: 700px) {
+  .body { grid-template-columns: 1fr; }
+  .sidebar { display: none; }
+  .commandbar, .addressbar { gap: 6px; }
+  .window { width: 98vw; height: 96vh; margin: 2vh auto; }
+  .files-list .row-head, .files-list .row { grid-template-columns: 1fr 100px 70px 60px; font-size: 11px; }
+}
 </style>
 </head>
 <body>
 
-<!-- =================== AUTH SCREEN =================== -->
+<!-- AUTH SCREEN -->
 <div id="auth-screen" class="auth-overlay">
   <div class="auth-card">
-    <div class="brand">
-      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M10 4H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-8l-2-2z"/></svg>
-      <h1>DigiLocker</h1>
-    </div>
+    <div class="brand"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M10 4H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-8l-2-2z"/></svg><h1>DigiLocker</h1></div>
     <p class="subtitle">Sign in to access your secure documents</p>
-
     <div id="auth-error" class="auth-error"></div>
-
     <label for="email">Email</label>
     <input type="email" id="email" placeholder="you@example.com" autocomplete="email" />
-
     <label for="password">Password</label>
     <input type="password" id="password" placeholder="••••••••" autocomplete="current-password" />
-
     <div class="btn-row">
       <button class="auth-btn primary" id="login-btn">Sign in</button>
       <button class="auth-btn" id="signup-btn">Create account</button>
     </div>
-
     <div class="divider">or</div>
-
-    <button id="google-btn" class="google-btn">
-      <svg width="16" height="16" viewBox="0 0 18 18">
-        <path d="M17.64 9.2c0-.63-.06-1.25-.16-1.84H9v3.47h4.84c-.21 1.12-.84 2.07-1.79 2.7l2.79 2.16c1.63-1.51 2.57-3.73 2.57-6.39z" fill="#4285F4"/>
-        <path d="M9 18c2.43 0 4.47-.8 5.96-2.18l-2.79-2.16c-.78.52-1.78.83-3.17.83-2.44 0-4.51-1.65-5.25-3.87H.83v2.2C2.32 15.8 5.4 18 9 18z" fill="#34A853"/>
-        <path d="M3.75 10.62c-.19-.57-.3-1.18-.3-1.82s.11-1.25.3-1.82V4.78H.83C.3 5.83 0 7.01 0 8.25s.3 2.42.83 3.47l2.92-2.1z" fill="#FBBC05"/>
-        <path d="M9 3.58c1.32 0 2.5.45 3.44 1.35l2.58-2.58C13.46.8 11.43 0 9 0 5.4 0 2.32 2.2 1.83 4.78l2.92 2.2c.74-2.22 2.81-3.87 5.25-3.87z" fill="#EA4335"/>
-      </svg>
-      Continue with Google
-    </button>
-
-    <div class="auth-toggle">
-      <span id="auth-switch-text">Don't have an account?</span>
-      <a id="auth-switch-link"> Sign up</a>
-    </div>
+    <button id="google-btn" class="google-btn"><svg width="16" height="16" viewBox="0 0 18 18"><path d="M17.64 9.2c0-.63-.06-1.25-.16-1.84H9v3.47h4.84c-.21 1.12-.84 2.07-1.79 2.7l2.79 2.16c1.63-1.51 2.57-3.73 2.57-6.39z" fill="#4285F4"/><path d="M9 18c2.43 0 4.47-.8 5.96-2.18l-2.79-2.16c-.78.52-1.78.83-3.17.83-2.44 0-4.51-1.65-5.25-3.87H.83v2.2C2.32 15.8 5.4 18 9 18z" fill="#34A853"/><path d="M3.75 10.62c-.19-.57-.3-1.18-.3-1.82s.11-1.25.3-1.82V4.78H.83C.3 5.83 0 7.01 0 8.25s.3 2.42.83 3.47l2.92-2.1z" fill="#FBBC05"/><path d="M9 3.58c1.32 0 2.5.45 3.44 1.35l2.58-2.58C13.46.8 11.43 0 9 0 5.4 0 2.32 2.2 1.83 4.78l2.92 2.2c.74-2.22 2.81-3.87 5.25-3.87z" fill="#EA4335"/></svg>Continue with Google</button>
+    <div class="auth-toggle"><span id="auth-switch-text">Don't have an account?</span><a id="auth-switch-link"> Sign up</a></div>
   </div>
 </div>
 
-<!-- =================== DASHBOARD =================== -->
+<!-- DASHBOARD -->
 <div id="dashboard-screen" class="window hidden">
-
-  <!-- Title bar -->
-  <div class="titlebar">
-    <div class="tab">
-      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M10 4H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-8l-2-2z"/></svg>
-      DigiLocker
-    </div>
-    <div class="spacer"></div>
-    <div class="winbtns">
-      <button title="Minimize">&#8211;</button>
-      <button title="Maximize">&#9633;</button>
-      <button class="close-btn" title="Close">&#10005;</button>
-    </div>
-  </div>
-
-  <!-- Command bar -->
-  <div class="commandbar">
-    <button class="cmd-btn primary" id="cmd-upload">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-      Upload
-    </button>
-    <button class="cmd-btn" id="cmd-new-folder" title="Coming soon" disabled>
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/><line x1="12" y1="11" x2="12" y2="17"/><line x1="9" y1="14" x2="15" y2="14"/></svg>
-      New folder
-    </button>
-    <div class="cmd-sep"></div>
-    <button class="cmd-btn" id="cmd-refresh">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
-      Refresh
-    </button>
-    <button class="cmd-btn" id="cmd-download" disabled>
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-      Download
-    </button>
-    <button class="cmd-btn" id="cmd-delete" disabled style="color:#ef4444">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
-      Delete
-    </button>
-    <div style="flex:1"></div>
-    <div id="user-chip" class="user-chip">
-      <span class="avatar" id="user-avatar">?</span>
-      <span id="user-display">user</span>
-      <button class="signout" id="logout-btn">Sign out</button>
-    </div>
-  </div>
-
-  <!-- Address bar -->
-  <div class="addressbar">
-    <div class="nav-arrows">
-      <button disabled title="Back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
-      <button disabled title="Forward"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></button>
-      <button disabled title="Up"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg></button>
-    </div>
-    <div class="crumbs">
-      <span class="crumb">
-        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M10 4H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-8l-2-2z"/></svg>
-        DigiLocker
-      </span>
-      <span class="crumb-sep">›</span>
-      <span class="crumb">My Documents</span>
-    </div>
-    <div class="searchbox">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-      <input type="text" id="search-input" placeholder="Search documents" />
-    </div>
-  </div>
-
-  <!-- Body -->
-  <div class="body">
-    <aside class="sidebar">
-      <div class="side-group">
-        <div class="side-group-title">Quick access</div>
-        <div class="side-item active">
-          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M10 4H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-8l-2-2z"/></svg>
-          My Documents
-        </div>
-        <div class="side-item">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-          Starred
-        </div>
-        <div class="side-item">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-          Recent
-        </div>
-        <div class="side-item">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
-          Shared with me
-        </div>
-      </div>
-      <div class="side-group">
-        <div class="side-group-title">Categories</div>
-        <div class="side-item">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="12" cy="10" r="3"/><path d="M7 20v-2a4 4 0 0 1 4-4h2a4 4 0 0 1 4 4v2"/></svg>
-          Identity
-        </div>
-        <div class="side-item">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-          Certificates
-        </div>
-        <div class="side-item">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
-          Finance
-        </div>
-        <div class="side-item">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
-          Property
-        </div>
-      </div>
-      <div class="side-group">
-        <div class="side-group-title">This PC</div>
-        <div class="side-item">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
-          Cloud (C:)
-        </div>
-      </div>
-    </aside>
-
-    <section class="main">
-      <div class="main-toolbar">
-        <span id="item-count">0 items</span>
-        <div class="view-toggle">
-          <button class="active" data-view="grid" title="Large icons">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
-          </button>
-          <button data-view="details" title="Details">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
-          </button>
-        </div>
-      </div>
-      <div id="filearea" class="filearea">
-        <div class="empty-state">
-          <div class="spinner"></div>
-          <h3>Loading…</h3>
-        </div>
-      </div>
-      <input type="file" id="file-picker" multiple hidden />
-    </section>
-  </div>
-
-  <!-- Status bar -->
-  <div class="statusbar">
-    <span id="status-text">Ready</span>
-    <div class="right">
-      <span id="selected-info"></span>
-      <span>DigiLocker · powered by Supabase ⚡</span>
-    </div>
-  </div>
+  <div class="titlebar"><div class="tab"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M10 4H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-8l-2-2z"/></svg>DigiLocker</div><div class="spacer"></div><div class="winbtns"><button>&#8211;</button><button>&#9633;</button><button class="close-btn">&#10005;</button></div></div>
+  <div class="commandbar"><button class="cmd-btn primary" id="cmd-upload"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>Upload</button><button class="cmd-btn" id="cmd-new-folder" disabled><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/><line x1="12" y1="11" x2="12" y2="17"/><line x1="9" y1="14" x2="15" y2="14"/></svg>New folder</button><div class="cmd-sep"></div><button class="cmd-btn" id="cmd-refresh"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>Refresh</button><button class="cmd-btn" id="cmd-download" disabled><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Download</button><button class="cmd-btn" id="cmd-delete" disabled style="color:#ef4444"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>Delete</button><div style="flex:1"></div><div id="user-chip" class="user-chip"><span class="avatar" id="user-avatar">?</span><span id="user-display">user</span><button class="signout" id="logout-btn">Sign out</button></div></div>
+  <div class="addressbar"><div class="nav-arrows"><button disabled><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="15 18 9 12 15 6"/></svg></button><button disabled><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="9 18 15 12 9 6"/></svg></button><button disabled><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="18 15 12 9 6 15"/></svg></button></div><div class="crumbs"><span class="crumb"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M10 4H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-8l-2-2z"/></svg>DigiLocker</span><span class="crumb-sep">›</span><span class="crumb">My Documents</span></div><div class="searchbox"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><input type="text" id="search-input" placeholder="Search documents" /></div></div>
+  <div class="body"><aside class="sidebar"><div class="side-group"><div class="side-group-title">Quick access</div><div class="side-item active" data-filter="all"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M10 4H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-8l-2-2z"/></svg>My Documents</div><div class="side-item" data-filter="starred"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>Starred</div><div class="side-item" data-filter="recent"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>Recent</div><div class="side-item" data-filter="shared"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>Shared with me</div></div><div class="side-group"><div class="side-group-title">Categories</div><div class="side-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="12" cy="10" r="3"/><path d="M7 20v-2a4 4 0 0 1 4-4h2a4 4 0 0 1 4 4v2"/></svg>Identity</div><div class="side-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>Certificates</div><div class="side-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>Finance</div><div class="side-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>Property</div></div><div class="side-group"><div class="side-group-title">This PC</div><div class="side-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>Cloud (C:)</div></div></aside><section class="main"><div class="main-toolbar"><span id="item-count">0 items</span><div class="view-toggle"><button class="active" data-view="grid"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg></button><button data-view="details"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg></button></div></div><div id="filearea" class="filearea"><div class="empty-state"><div class="spinner"></div><h3>Loading…</h3></div></div><input type="file" id="file-picker" multiple hidden /></section></div>
+  <div class="statusbar"><span id="status-text">Ready</span><div class="right"><span id="selected-info"></span><span>DigiLocker · powered by Supabase ⚡</span></div></div>
 </div>
-
 <div id="toast" class="toast"></div>
 
-<!-- =================== FIREBASE LOGIC =================== -->
 <script type="module">
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-
-// ---- Supabase config ----
-const SUPABASE_URL    = "https://edvrzshtnralwsvlgbzo.supabase.co";
-const SUPABASE_ANON   = "sb_publishable_iRsFPQktJ9G6i6FPQSFewA_139c0SeP";
-const BUCKET          = "documents";
-
+const SUPABASE_URL = "https://edvrzshtnralwsvlgbzo.supabase.co";
+const SUPABASE_ANON = "sb_publishable_iRsFPQktJ9G6i6FPQSFewA_139c0SeP";
+const BUCKET = "documents";
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON);
 
-// ---- DOM helpers ----
 const $ = id => document.getElementById(id);
+const authScreen = $('auth-screen'), dashboard = $('dashboard-screen');
+const emailInput = $('email'), passwordInput = $('password');
+const filearea = $('filearea'), filePicker = $('file-picker');
+const userDisplay = $('user-display'), userAvatar = $('user-avatar');
+const statusText = $('status-text'), itemCount = $('item-count'), selectedInfo = $('selected-info');
+const toast = $('toast'), searchInput = $('search-input'), authError = $('auth-error');
+let currentView = 'grid', allFiles = [], selectedFiles = new Set(), isSignUpMode = false;
 
-const authScreen    = $('auth-screen');
-const dashboard     = $('dashboard-screen');
-const emailInput    = $('email');
-const passwordInput = $('password');
-const filearea      = $('filearea');
-const filePicker    = $('file-picker');
-const userDisplay   = $('user-display');
-const userAvatar    = $('user-avatar');
-const statusText    = $('status-text');
-const itemCount     = $('item-count');
-const selectedInfo  = $('selected-info');
-const toast         = $('toast');
-const searchInput   = $('search-input');
-const authError     = $('auth-error');
+function showToast(msg) { toast.textContent = msg; toast.classList.add('show'); clearTimeout(showToast._t); showToast._t = setTimeout(() => toast.classList.remove('show'), 2800); }
+function showAuthError(msg) { authError.textContent = msg; authError.classList.add('show'); }
+function clearAuthError() { authError.textContent = ''; authError.classList.remove('show'); }
+function setAuthLoading(load) { $('login-btn').disabled = load; $('signup-btn').disabled = load; $('google-btn').disabled = load; }
+function formatBytes(b) { if (!b) return '—'; const u = ['B','KB','MB','GB']; let i=0; while(b>=1024 && i<u.length-1){b/=1024;i++;} return b.toFixed(i===0?0:1)+' '+u[i]; }
+function formatDate(d) { return d ? new Date(d).toLocaleDateString()+' '+new Date(d).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}) : '—'; }
+function getExt(name) { let i=name.lastIndexOf('.'); return i>=0 ? name.slice(i+1).toLowerCase() : ''; }
+function fileTypeLabel(ext) { const map={pdf:'PDF',jpg:'JPEG',jpeg:'JPEG',png:'PNG',gif:'GIF',webp:'WebP',doc:'DOC',docx:'DOCX',xls:'XLS',xlsx:'XLSX',txt:'TEXT',zip:'ZIP',mp4:'MP4',mp3:'MP3',mov:'MOV',avi:'AVI',json:'JSON',xml:'XML',html:'HTML',css:'CSS',js:'JS'}; return map[ext] || (ext ? ext.toUpperCase() : 'FILE'); }
+function fileIcon(ext) { const color='#0067c0'; const label=fileTypeLabel(ext).slice(0,4); const uid=`g${Math.random().toString(36).slice(2,8)}`; return `<svg viewBox="0 0 64 80"><defs><linearGradient id="${uid}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#eaeaea"/></linearGradient></defs><path d="M8 2H40L56 18V74a4 4 0 0 1-4 4H8a4 4 0 0 1-4-4V6a4 4 0 0 1 4-4z" fill="url(#${uid})" stroke="#bdbdbd" stroke-width="1"/><path d="M40 2V18H56z" fill="#cfd8dc" stroke="#bdbdbd"/><rect x="4" y="44" width="48" height="22" rx="2" fill="${color}"/><text x="28" y="59" text-anchor="middle" fill="#fff" font-family="Segoe UI,sans-serif" font-weight="700" font-size="11">${label}</text></svg>`; }
+function escapeHtml(s) { return String(s).replace(/[&<>]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[m])); }
 
-let currentView = 'grid';
-let allFiles = [];
-let selectedFiles = new Set();
-let isSignUpMode = false;
+function updateAuthMode() { $('login-btn').textContent = 'Sign in'; $('signup-btn').textContent = 'Create account'; $('auth-switch-text').textContent = isSignUpMode ? 'Already have an account?' : "Don't have an account?"; $('auth-switch-link').textContent = isSignUpMode ? ' Sign in' : ' Sign up'; }
+$('auth-switch-link').addEventListener('click', () => { isSignUpMode = !isSignUpMode; clearAuthError(); updateAuthMode(); });
+$('login-btn').addEventListener('click', async () => { clearAuthError(); const email=emailInput.value.trim(), pass=passwordInput.value; if(!email||!pass){showAuthError('Enter email and password');return;} setAuthLoading(true); const{error}=await supabase.auth.signInWithPassword({email,password:pass}); if(error) showAuthError(error.message); setAuthLoading(false); });
+$('signup-btn').addEventListener('click', async () => { clearAuthError(); const email=emailInput.value.trim(), pass=passwordInput.value; if(!email||!pass){showAuthError('Enter email and password');return;} if(pass.length<6){showAuthError('Password min 6 chars');return;} setAuthLoading(true); const{error}=await supabase.auth.signUp({email,password:pass}); if(error) showAuthError(error.message); else showToast('Account created! Check email to confirm.'); setAuthLoading(false); });
+$('google-btn').addEventListener('click', async () => { clearAuthError(); await supabase.auth.signInWithOAuth({provider:'google',options:{redirectTo:window.location.href}}); });
+$('logout-btn').addEventListener('click', async () => { await supabase.auth.signOut(); showToast('Signed out.'); });
+[emailInput,passwordInput].forEach(el=>el.addEventListener('keydown',e=>{if(e.key==='Enter')$('login-btn').click();}));
 
-// ---- Utilities ----
-function showToast(msg) {
-  toast.textContent = msg;
-  toast.classList.add('show');
-  clearTimeout(showToast._t);
-  showToast._t = setTimeout(() => toast.classList.remove('show'), 2800);
-}
-
-function showAuthError(msg) {
-  authError.textContent = msg;
-  authError.classList.add('show');
-}
-function clearAuthError() {
-  authError.textContent = '';
-  authError.classList.remove('show');
-}
-
-function setAuthLoading(loading) {
-  $('login-btn').disabled = loading;
-  $('signup-btn').disabled = loading;
-  $('google-btn').disabled = loading;
-  $('login-btn').textContent = loading && !isSignUpMode ? 'Signing in…' : (isSignUpMode ? 'Sign in' : 'Sign in');
-  $('signup-btn').textContent = loading && isSignUpMode ? 'Creating…' : (isSignUpMode ? 'Sign in' : 'Create account');
-}
-
-function formatBytes(bytes) {
-  if (!bytes) return '—';
-  const u = ['B','KB','MB','GB']; let i = 0;
-  while (bytes >= 1024 && i < u.length - 1) { bytes /= 1024; i++; }
-  return bytes.toFixed(i === 0 ? 0 : 1) + ' ' + u[i];
-}
-
-function formatDate(d) {
-  if (!d) return '—';
-  return new Date(d).toLocaleDateString(undefined, { year:'numeric', month:'short', day:'numeric' })
-    + ' ' + new Date(d).toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' });
-}
-
-function getExt(name) {
-  const i = name.lastIndexOf('.');
-  return i >= 0 ? name.slice(i + 1).toLowerCase() : '';
-}
-
-function fileTypeLabel(ext) {
-  const map = {
-    pdf:'PDF Document', jpg:'JPEG Image', jpeg:'JPEG Image', png:'PNG Image',
-    gif:'GIF Image', webp:'WebP Image', doc:'Word Document', docx:'Word Document',
-    xls:'Excel Sheet', xlsx:'Excel Sheet', txt:'Text File',
-    zip:'Compressed', mp4:'Video', mp3:'Audio'
-  };
-  return map[ext] || (ext ? ext.toUpperCase() + ' File' : 'File');
-}
-
-function fileIcon(ext) {
-  const colors = {
-    pdf:'#e53935', doc:'#1565c0', docx:'#1565c0',
-    xls:'#2e7d32', xlsx:'#2e7d32',
-    jpg:'#8e24aa', jpeg:'#8e24aa', png:'#8e24aa', gif:'#8e24aa', webp:'#8e24aa',
-    zip:'#f9a825', txt:'#616161', mp4:'#d81b60', mp3:'#00838f'
-  };
-  const color = colors[ext] || '#0067c0';
-  const label = (ext || 'FILE').toUpperCase().slice(0, 4);
-  const uid = `g${Math.random().toString(36).slice(2,6)}`;
-  return `<svg viewBox="0 0 64 80" xmlns="http://www.w3.org/2000/svg">
-    <defs>
-      <linearGradient id="${uid}" x1="0" x2="0" y1="0" y2="1">
-        <stop offset="0" stop-color="#ffffff"/>
-        <stop offset="1" stop-color="#eaeaea"/>
-      </linearGradient>
-    </defs>
-    <path d="M8 2H40L56 18V74a4 4 0 0 1-4 4H8a4 4 0 0 1-4-4V6a4 4 0 0 1 4-4z" fill="url(#${uid})" stroke="#bdbdbd" stroke-width="1"/>
-    <path d="M40 2V18H56z" fill="#cfd8dc" stroke="#bdbdbd" stroke-width="1"/>
-    <rect x="4" y="44" width="48" height="22" rx="2" fill="${color}"/>
-    <text x="28" y="59" text-anchor="middle" fill="#fff" font-family="Segoe UI,Arial,sans-serif" font-weight="700" font-size="11">${label}</text>
-  </svg>`;
-}
-
-function escapeHtml(s) {
-  return String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
-}
-
-// ---- Auth UI mode toggle ----
-function updateAuthMode() {
-  $('login-btn').textContent         = isSignUpMode ? 'Sign in'        : 'Sign in';
-  $('signup-btn').textContent        = isSignUpMode ? 'Create account' : 'Create account';
-  $('auth-switch-text').textContent  = isSignUpMode ? 'Already have an account?' : "Don't have an account?";
-  $('auth-switch-link').textContent  = isSignUpMode ? ' Sign in' : ' Sign up';
-}
-
-$('auth-switch-link').addEventListener('click', () => {
-  isSignUpMode = !isSignUpMode;
-  clearAuthError();
-  updateAuthMode();
+supabase.auth.onAuthStateChange((_event,session)=>{
+  if(session?.user){ authScreen.classList.add('hidden'); dashboard.classList.remove('hidden'); const name=session.user.user_metadata?.full_name||session.user.email||'user'; userDisplay.textContent=name; userAvatar.textContent=name[0].toUpperCase(); loadDocuments(session.user.id); }
+  else{ authScreen.classList.remove('hidden'); dashboard.classList.add('hidden'); allFiles=[]; selectedFiles.clear(); }
 });
 
-// ---- Auth handlers ----
-$('login-btn').addEventListener('click', async () => {
-  clearAuthError();
-  const email = emailInput.value.trim();
-  const pass  = passwordInput.value;
-  if (!email || !pass) { showAuthError('please enter your email and password.'); return; }
-  setAuthLoading(true);
-  const { error } = await supabase.auth.signInWithPassword({ email, password: pass });
-  if (error) showAuthError(friendlyError(error.message));
-  setAuthLoading(false);
+$('cmd-upload').addEventListener('click',()=>filePicker.click());
+filePicker.addEventListener('change',()=>{if(filePicker.files.length)handleFiles(filePicker.files);});
+filearea.addEventListener('dragover',e=>{e.preventDefault();filearea.classList.add('drag-over');});
+filearea.addEventListener('dragleave',()=>filearea.classList.remove('drag-over'));
+filearea.addEventListener('drop',e=>{e.preventDefault();filearea.classList.remove('drag-over');handleFiles(e.dataTransfer.files);});
+
+async function handleFiles(fileList){ const{data:{user}}=await supabase.auth.getUser(); if(!user||!fileList?.length)return; const files=Array.from(fileList); statusText.textContent=`Uploading ${files.length}...`; let failed=0; for(const file of files){ const path=`${user.id}/${file.name}`; const{error}=await supabase.storage.from(BUCKET).upload(path,file,{upsert:true}); if(error){failed++;console.error(error);} } filePicker.value=''; showToast(failed?`⚠️ ${failed} failed`:`✅ ${files.length} uploaded`); statusText.textContent='Upload complete'; loadDocuments(user.id); }
+$('cmd-refresh').addEventListener('click',async()=>{const{data:{user}}=await supabase.auth.getUser();if(user)loadDocuments(user.id);});
+$('cmd-download').addEventListener('click',()=>{selectedFiles.forEach(name=>{const f=allFiles.find(x=>x.name===name);if(f?.url)window.open(f.url,'_blank');});});
+$('cmd-delete').addEventListener('click',async()=>{ if(!selectedFiles.size)return; const names=[...selectedFiles]; if(!confirm(`Delete ${names.length} file(s)? Cannot undo.`))return; const{data:{user}}=await supabase.auth.getUser(); if(!user)return; statusText.textContent='Deleting...'; const paths=names.map(n=>`${user.id}/${n}`); const{error}=await supabase.storage.from(BUCKET).remove(paths); if(error){showToast('❌ '+error.message);statusText.textContent='Delete failed';return;} showToast(`🗑️ Deleted ${names.length} file(s)`); loadDocuments(user.id); });
+
+document.querySelectorAll('.view-toggle button').forEach(btn=>{ btn.addEventListener('click',()=>{ document.querySelectorAll('.view-toggle button').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); currentView=btn.dataset.view; render(); }); });
+searchInput.addEventListener('input',render);
+
+async function loadDocuments(uid){ filearea.innerHTML=`<div class="empty-state"><div class="spinner"></div><h3>Loading…</h3></div>`; statusText.textContent='Loading...'; const{data,error}=await supabase.storage.from(BUCKET).list(uid,{limit:500,sortBy:{column:'name',order:'asc'}}); if(error){ filearea.innerHTML=`<div class="empty-state"><div class="big-icon">⚠️</div><h3>Failed to load</h3><p>${escapeHtml(error.message)}</p></div>`; statusText.textContent='Error'; return; } allFiles=(data||[]).filter(f=>f.name!=='.emptyFolderPlaceholder').map(f=>{ const{data:{publicUrl}}=supabase.storage.from(BUCKET).getPublicUrl(`${uid}/${f.name}`); return{ name:f.name, url:publicUrl, size:f.metadata?.size||0, updated:f.updated_at||f.created_at, ext:getExt(f.name), path:`${uid}/${f.name}` }; }); selectedFiles.clear(); render(); statusText.textContent='Ready'; }
+
+let tapTimer=null; let lastTapFile=null;
+function render(){ const q=searchInput.value.toLowerCase().trim(); let files=q?allFiles.filter(f=>f.name.toLowerCase().includes(q)):allFiles; itemCount.textContent=`${files.length} item${files.length===1?'':'s'}`; if(files.length===0){ filearea.innerHTML=q?`<div class="empty-state"><div class="big-icon">🔍</div><h3>No matches</h3><p>Try different search.</p></div>`:`<div class="empty-state"><div class="big-icon">📁</div><h3>Folder empty</h3><button class="empty-upload-btn" id="empty-upload-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>Upload your first file</button></div>`; if(!q)document.getElementById('empty-upload-btn')?.addEventListener('click',()=>filePicker.click()); updateSelection(); return; }
+if(currentView==='grid'){ filearea.innerHTML=`<div class="files-grid">${files.map(f=>`<div class="file-card${selectedFiles.has(f.name)?' selected':''}" data-name="${escapeHtml(f.name)}"><div class="icon">${fileIcon(f.ext)}</div><div class="name" title="${escapeHtml(f.name)}">${escapeHtml(f.name)}</div></div>`).join('')}</div>`; }
+else{ filearea.innerHTML=`<div class="files-list"><div class="row-head"><div>Name</div><div>Date modified</div><div>Type</div><div>Size</div></div>${files.map(f=>`<div class="row${selectedFiles.has(f.name)?' selected':''}" data-name="${escapeHtml(f.name)}"><div class="name-cell">${fileIcon(f.ext)}<span title="${escapeHtml(f.name)}">${escapeHtml(f.name)}</span></div><div>${formatDate(f.updated)}</div><div>${fileTypeLabel(f.ext)}</div><div>${formatBytes(f.size)}</div></div>`).join('')}</div>`; }
+filearea.querySelectorAll('[data-name]').forEach(el=>{ const fileName=el.dataset.name; const fileObj=files.find(f=>f.name===fileName);
+  const handleSelect=(e,isContext=false)=>{ e.preventDefault(); if(isContext){ selectedFiles.clear(); selectedFiles.add(fileName); render(); showContextMenu(fileName); return; } if(e.ctrlKey||e.metaKey){ selectedFiles.has(fileName)?selectedFiles.delete(fileName):selectedFiles.add(fileName); }else{ if(selectedFiles.has(fileName)&&selectedFiles.size===1){} else{ selectedFiles.clear(); selectedFiles.add(fileName); } } render(); };
+  el.addEventListener('click',(e)=>handleSelect(e,false));
+  el.addEventListener('contextmenu',(e)=>handleSelect(e,true));
+  // Mobile double-tap -> right-click simulation (2 fast taps)
+  el.addEventListener('touchstart',(e)=>{ const now=Date.now(); if(tapTimer && lastTapFile===fileName && (now-tapTimer)<300){ e.preventDefault(); handleSelect(e,true); tapTimer=null; lastTapFile=null; }else{ tapTimer=now; lastTapFile=fileName; setTimeout(()=>{ if(tapTimer===now){ tapTimer=null; lastTapFile=null; } },320); } });
+  el.addEventListener('dblclick',()=>{ if(fileObj?.url)window.open(fileObj.url,'_blank'); });
 });
+updateSelection(); }
 
-$('signup-btn').addEventListener('click', async () => {
-  clearAuthError();
-  const email = emailInput.value.trim();
-  const pass  = passwordInput.value;
-  if (!email || !pass) { showAuthError('please enter your email and password.'); return; }
-  if (pass.length < 6) { showAuthError('password must be at least 6 characters.'); return; }
-  setAuthLoading(true);
-  const { error } = await supabase.auth.signUp({ email, password: pass });
-  if (error) showAuthError(friendlyError(error.message));
-  else showToast('✅ account created! check your email to confirm, then sign in.');
-  setAuthLoading(false);
-});
-
-$('google-btn').addEventListener('click', async () => {
-  clearAuthError();
-  const { error } = await supabase.auth.signInWithOAuth({
-    provider: 'google',
-    options: { redirectTo: window.location.href }
-  });
-  if (error) showAuthError(friendlyError(error.message));
-});
-
-$('logout-btn').addEventListener('click', async () => {
-  await supabase.auth.signOut();
-  showToast('signed out. see ya! 👋');
-});
-
-function friendlyError(msg) {
-  if (!msg) return 'something went wrong. please try again.';
-  const m = msg.toLowerCase();
-  if (m.includes('invalid login') || m.includes('invalid credentials')) return 'incorrect email or password.';
-  if (m.includes('email not confirmed')) return 'please confirm your email first — check your inbox!';
-  if (m.includes('already registered') || m.includes('already exists')) return 'an account with that email already exists.';
-  if (m.includes('password')) return 'password should be at least 6 characters.';
-  if (m.includes('rate limit')) return 'too many attempts. please wait a moment.';
-  if (m.includes('network') || m.includes('fetch')) return 'network error. check your connection.';
-  return msg;
-}
-
-[emailInput, passwordInput].forEach(el =>
-  el.addEventListener('keydown', e => { if (e.key === 'Enter') $('login-btn').click(); }));
-
-// ---- Session listener ----
-supabase.auth.onAuthStateChange((_event, session) => {
-  const user = session?.user ?? null;
-  if (user) {
-    authScreen.classList.add('hidden');
-    dashboard.classList.remove('hidden');
-    const name = user.user_metadata?.full_name || user.email || 'user';
-    userDisplay.textContent = name;
-    userAvatar.textContent  = (name[0] || '?').toUpperCase();
-    loadDocuments(user.id);
-  } else {
-    authScreen.classList.remove('hidden');
-    dashboard.classList.add('hidden');
-    allFiles = [];
-    selectedFiles.clear();
-  }
-});
-
-// ---- Upload ----
-$('cmd-upload').addEventListener('click', () => filePicker.click());
-filePicker.addEventListener('change', () => { if (filePicker.files.length) handleFiles(filePicker.files); });
-
-filearea.addEventListener('dragover', e => { e.preventDefault(); filearea.classList.add('drag-over'); });
-filearea.addEventListener('dragleave', () => filearea.classList.remove('drag-over'));
-filearea.addEventListener('drop', e => {
-  e.preventDefault(); filearea.classList.remove('drag-over');
-  handleFiles(e.dataTransfer.files);
-});
-
-async function handleFiles(fileList) {
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user || !fileList?.length) return;
-  const files = Array.from(fileList);
-  statusText.textContent = `uploading ${files.length} file${files.length > 1 ? 's' : ''}…`;
-  let failed = 0;
-  for (const file of files) {
-    const path = `${user.id}/${file.name}`;
-    const { error } = await supabase.storage.from(BUCKET).upload(path, file, { upsert: true });
-    if (error) { failed++; console.error(error); }
-  }
-  filePicker.value = '';
-  if (failed) showToast(`⚠️ ${failed} file(s) failed to upload`);
-  else showToast(`✅ uploaded ${files.length} file${files.length > 1 ? 's' : ''}!`);
-  statusText.textContent = failed ? 'upload had errors' : 'upload complete';
-  loadDocuments(user.id);
-}
-
-// ---- Refresh ----
-$('cmd-refresh').addEventListener('click', async () => {
-  const { data: { user } } = await supabase.auth.getUser();
-  if (user) loadDocuments(user.id);
-});
-
-// ---- Download ----
-$('cmd-download').addEventListener('click', () => {
-  selectedFiles.forEach(name => {
-    const f = allFiles.find(x => x.name === name);
-    if (f?.url) window.open(f.url, '_blank');
-  });
-});
-
-// ---- Delete ----
-$('cmd-delete').addEventListener('click', async () => {
-  if (!selectedFiles.size) return;
-  const names = [...selectedFiles];
-  if (!window.confirm(`delete ${names.length} file${names.length > 1 ? 's' : ''}? this cannot be undone.`)) return;
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return;
-  statusText.textContent = 'deleting…';
-  const paths = names.map(n => `${user.id}/${n}`);
-  const { error } = await supabase.storage.from(BUCKET).remove(paths);
-  if (error) { showToast('❌ ' + error.message); statusText.textContent = 'delete failed'; return; }
-  showToast(`🗑️ deleted ${names.length} file${names.length > 1 ? 's' : ''}`);
-  loadDocuments(user.id);
-});
-
-// ---- View toggle ----
-document.querySelectorAll('.view-toggle button').forEach(btn => {
-  btn.addEventListener('click', () => {
-    document.querySelectorAll('.view-toggle button').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    currentView = btn.dataset.view;
-    render();
-  });
-});
-
-searchInput.addEventListener('input', render);
-
-// ---- Load documents ----
-async function loadDocuments(uid) {
-  filearea.innerHTML = `<div class="empty-state"><div class="spinner"></div><h3>loading your documents…</h3></div>`;
-  statusText.textContent = 'loading…';
-  const { data, error } = await supabase.storage.from(BUCKET).list(uid, { limit: 500, sortBy: { column: 'name', order: 'asc' } });
-  if (error) {
-    filearea.innerHTML = `<div class="empty-state"><div class="big-icon">⚠️</div><h3>couldn't load files</h3><p>${escapeHtml(error.message)}</p></div>`;
-    statusText.textContent = 'error'; return;
-  }
-  allFiles = (data || [])
-    .filter(f => f.name !== '.emptyFolderPlaceholder')
-    .map(f => {
-      const { data: { publicUrl } } = supabase.storage.from(BUCKET).getPublicUrl(`${uid}/${f.name}`);
-      return {
-        name: f.name,
-        url: publicUrl,
-        size: f.metadata?.size || 0,
-        updated: f.updated_at || f.created_at,
-        ext: getExt(f.name),
-        path: `${uid}/${f.name}`
-      };
-    });
-  selectedFiles.clear();
-  render();
-  statusText.textContent = 'ready';
-}
-
-// ---- Render ----
-function render() {
-  const q = (searchInput.value || '').toLowerCase().trim();
-  const files = q ? allFiles.filter(f => f.name.toLowerCase().includes(q)) : allFiles;
-  itemCount.textContent = `${files.length} item${files.length === 1 ? '' : 's'}`;
-
-  if (files.length === 0) {
-    filearea.innerHTML = q
-      ? `<div class="empty-state"><div class="big-icon">🔍</div><h3>no matches</h3><p>try a different search term.</p></div>`
-      : `<div class="empty-state">
-           <div class="big-icon">📁</div>
-           <h3>this folder is empty</h3>
-           <p>drop files here or click the button below to get started.</p>
-           <button class="empty-upload-btn" id="empty-upload-btn">
-             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-             upload your first file
-           </button>
-         </div>`;
-    if (!q) document.getElementById('empty-upload-btn')?.addEventListener('click', () => filePicker.click());
-    updateSelection(); return;
-  }
-
-  if (currentView === 'grid') {
-    filearea.innerHTML = `<div class="files-grid">${files.map(f => `
-      <div class="file-card${selectedFiles.has(f.name) ? ' selected' : ''}" data-name="${escapeHtml(f.name)}">
-        <div class="icon">${fileIcon(f.ext)}</div>
-        <div class="name" title="${escapeHtml(f.name)}">${escapeHtml(f.name)}</div>
-      </div>`).join('')}</div>`;
-  } else {
-    filearea.innerHTML = `<div class="files-list">
-      <div class="row-head"><div>name</div><div>date modified</div><div>type</div><div>size</div></div>
-      ${files.map(f => `
-        <div class="row${selectedFiles.has(f.name) ? ' selected' : ''}" data-name="${escapeHtml(f.name)}">
-          <div class="name-cell">${fileIcon(f.ext)}<span title="${escapeHtml(f.name)}">${escapeHtml(f.name)}</span></div>
-          <div>${formatDate(f.updated)}</div>
-          <div>${fileTypeLabel(f.ext)}</div>
-          <div>${formatBytes(f.size)}</div>
-        </div>`).join('')}
-    </div>`;
-  }
-
-  filearea.querySelectorAll('[data-name]').forEach(el => {
-    el.addEventListener('click', e => {
-      const name = el.dataset.name;
-      if (e.ctrlKey || e.metaKey) {
-        selectedFiles.has(name) ? selectedFiles.delete(name) : selectedFiles.add(name);
-      } else { selectedFiles.clear(); selectedFiles.add(name); }
-      render();
-    });
-    el.addEventListener('dblclick', () => {
-      const f = allFiles.find(x => x.name === el.dataset.name);
-      if (f?.url) window.open(f.url, '_blank');
-    });
-  });
-  updateSelection();
-}
-
-function updateSelection() {
-  const n = selectedFiles.size;
-  $('cmd-download').disabled = n === 0;
-  $('cmd-delete').disabled   = n === 0;
-  selectedInfo.textContent   = n > 0 ? `${n} selected` : '';
-}
+function showContextMenu(fileName){ const f=allFiles.find(x=>x.name===fileName); if(!f)return; const action=confirm(`Right-click on "${fileName}"\n\nOpen? (OK = Open, Cancel = Show options)`); if(action){ window.open(f.url,'_blank'); }else{ const deleteConfirm=confirm(`Delete "${fileName}"?`); if(deleteConfirm){ (async()=>{ const{data:{user}}=await supabase.auth.getUser(); if(!user)return; const paths=[`${user.id}/${fileName}`]; await supabase.storage.from(BUCKET).remove(paths); showToast(`Deleted ${fileName}`); loadDocuments(user.id); })(); } } }
+function updateSelection(){ const n=selectedFiles.size; $('cmd-download').disabled=n===0; $('cmd-delete').disabled=n===0; selectedInfo.textContent=n>0?`${n} selected`:''; }
+// Sidebar basic interactions (demo filters)
+document.querySelectorAll('.side-item').forEach(item=>{ item.addEventListener('click',()=>{ document.querySelectorAll('.side-item').forEach(i=>i.classList.remove('active')); item.classList.add('active'); if(item.dataset.filter==='recent'){ const sorted=[...allFiles].sort((a,b)=>new Date(b.updated)-new Date(a.updated)); allFiles=sorted; render(); setTimeout(()=>loadDocuments((supabase.auth.getUser()).then(({data})=>data.user?.id)),100); }else if(item.dataset.filter==='all'){ location.reload(); }else{ showToast('Demo: category filters coming soon'); } }); });
 </script>
 </body>
 </html>
