@@ -1,237 +1,1059 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover" />
-  <title>Classroom — Attendance & Gallery Hub</title>
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%230d9488'%3E%3Crect x='3' y='4' width='18' height='18' rx='2'/%3E%3Cline x1='16' y1='2' x2='16' y2='6'/%3E%3Cline x1='8' y1='2' x2='8' y2='6'/%3E%3Cline x1='3' y1='10' x2='21' y2='10'/%3E%3C/svg%3E" />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cropperjs@1.5.13/dist/cropper.min.css" />
-  <style>
-    /* ─── Reset & Base (preserved from original, enhanced for gallery) ─── */
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>DigiLocker — File Explorer</title>
+<meta name="description" content="Your personal DigiLocker — securely store, access and share documents." />
 
-    :root {
-      --teal: #0d9488;
-      --teal-dark: #0f766e;
-      --teal-dim: #134e4a;
-      --teal-glow: rgba(13,148,136,.15);
-      --teal-gradient: linear-gradient(135deg, #0d9488, #14b8a6);
-      --bg: #f0f2f5;
-      --white: #ffffff;
-      --border: #e4e7ec;
-      --border-mid: #d0d5dd;
-      --text: #0f172a;
-      --text-mid: #334155;
-      --text-mute: #94a3b8;
-      --green: #16a34a;
-      --green-bg: #dcfce7;
-      --red: #dc2626;
-      --red-bg: #fee2e2;
-      --amber: #d97706;
-      --amber-bg: #fef3c7;
-      --indigo: #4f46e5;
-      --r-sm: 8px;
-      --r: 12px;
-      --r-lg: 16px;
-      --r-xl: 20px;
-    }
+<!-- Favicon as inline SVG data URI -->
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%232563eb'/%3E%3Cpath d='M6 10h8l2 3h10a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V12a2 2 0 0 1 2-2z' fill='white'/%3E%3C/svg%3E" />
 
-    html, body { height: 100%; font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); font-size: 14px; }
-    .layout { display: flex; height: 100vh; overflow: hidden; }
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&family=Instrument+Serif&display=swap" rel="stylesheet" />
 
-    /* Sidebar (same as original) */
-    .sidebar { width: 260px; min-width: 260px; background: #0b1f1d; display: flex; flex-direction: column; padding: 24px 16px; gap: 32px; overflow-y: auto; }
-    .sidebar-brand { display: flex; align-items: center; gap: 12px; padding: 4px 8px; }
-    .brand-icon { width: 40px; height: 40px; border-radius: 12px; background: linear-gradient(135deg, var(--teal) 0%, #0891b2 100%); display: flex; align-items: center; justify-content: center; color: #fff; box-shadow: 0 4px 12px rgba(13,148,136,.4); }
-    .brand-icon svg { width: 20px; height: 20px; }
-    .brand-title { font-weight: 800; font-size: 15px; color: #fff; }
-    .brand-sub { font-size: 11px; color: rgba(255,255,255,.45); }
-    .nav { display: flex; flex-direction: column; gap: 4px; }
-    .nav-item { display: flex; align-items: center; gap: 12px; padding: 10px 12px; border: none; background: transparent; border-radius: var(--r-sm); color: rgba(255,255,255,.55); font-size: 13px; font-weight: 600; cursor: pointer; width: 100%; font-family: inherit; }
-    .nav-item svg { width: 18px; height: 18px; }
-    .nav-item:hover { background: rgba(255,255,255,.08); color: rgba(255,255,255,.85); }
-    .nav-item.active { background: rgba(255,255,255,.12); color: #fff; position: relative; }
-    .nav-item.active::before { content: ''; position: absolute; left: 0; top: 50%; transform: translateY(-50%); width: 3px; height: 20px; background: var(--teal); border-radius: 0 3px 3px 0; }
-    .nav-spacer { flex: 1; }
+<style>
+:root {
+  --bg: #eef1f6;
+  --chrome: rgba(255,255,255,0.72);
+  --chrome-2: rgba(255,255,255,0.88);
+  --panel: #ffffff;
+  --border: rgba(15,23,42,0.08);
+  --border-strong: rgba(15,23,42,0.16);
+  --text: #0f172a;
+  --text-muted: #475569;
+  --text-faint: #94a3b8;
+  --accent: #2563eb;
+  --accent-hover: #1d4ed8;
+  --accent-soft: #dbe7ff;
+  --accent-soft-2: #eef3ff;
+  --selection: #dbeafe;
+  --selection-border: #93c5fd;
+  --shadow: 0 24px 60px -20px rgba(15,23,42,0.25), 0 8px 24px -12px rgba(15,23,42,0.12);
+  --shadow-sm: 0 1px 2px rgba(15,23,42,0.05);
+  --radius: 14px;
+  --radius-sm: 8px;
+  --font: "Inter Tight", "Segoe UI", -apple-system, system-ui, sans-serif;
+  --font-display: "Instrument Serif", serif;
+  --app-bg: radial-gradient(1200px 800px at 0% 0%, #e0e7ff 0%, transparent 55%),
+            radial-gradient(1000px 700px at 100% 100%, #dbeafe 0%, transparent 55%),
+            linear-gradient(180deg, #f5f7fb 0%, #eef1f6 100%);
+}
 
-    /* Main content */
-    .main { flex: 1; overflow-y: auto; padding: 32px 40px; background: var(--bg); }
-    @media (max-width: 768px) { .main { padding: 20px 16px; } .sidebar { width: 70px; min-width: 70px; } .sidebar-brand, .brand-title, .brand-sub, .nav-item span { display: none; } .nav-item { justify-content: center; } }
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0b1020;
+    --chrome: rgba(20,26,45,0.72);
+    --chrome-2: rgba(28,35,56,0.88);
+    --panel: #141a2d;
+    --border: rgba(255,255,255,0.08);
+    --border-strong: rgba(255,255,255,0.16);
+    --text: #f1f5f9;
+    --text-muted: #cbd5e1;
+    --text-faint: #64748b;
+    --accent: #60a5fa;
+    --accent-hover: #93c5fd;
+    --accent-soft: rgba(96,165,250,0.18);
+    --accent-soft-2: rgba(96,165,250,0.10);
+    --selection: rgba(96,165,250,0.22);
+    --selection-border: rgba(96,165,250,0.45);
+    --shadow: 0 24px 60px -20px rgba(0,0,0,0.6), 0 8px 24px -12px rgba(0,0,0,0.4);
+    --app-bg: radial-gradient(1200px 800px at 0% 0%,#1e1b4b 0%,transparent 55%),
+              radial-gradient(1000px 700px at 100% 100%,#0c1e3e 0%,transparent 55%),
+              linear-gradient(180deg,#060914 0%,#0b1020 100%);
+  }
+}
 
-    /* Cards, stats, modals (original styling preserved) */
-    .card { background: var(--white); border-radius: var(--r-lg); border: 1px solid var(--border); overflow: hidden; margin-bottom: 20px; }
-    .page-header { display: flex; align-items: flex-start; justify-content: space-between; flex-wrap: wrap; gap: 16px; margin-bottom: 28px; }
-    .page-title { font-size: 28px; font-weight: 800; }
-    .btn { display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; border-radius: var(--r-sm); font-size: 13px; font-weight: 700; cursor: pointer; border: 1px solid transparent; }
-    .btn-primary { background: var(--teal); color: #fff; }
-    .btn-ghost { background: var(--white); color: var(--text-mid); border-color: var(--border); }
-    .toast-container { position: fixed; bottom: 24px; right: 24px; z-index: 1100; display: flex; flex-direction: column; gap: 10px; }
-    .toast { background: var(--text); color: #fff; padding: 12px 20px; border-radius: var(--r); font-weight: 600; box-shadow: 0 8px 24px rgba(0,0,0,.2); }
-    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.5); backdrop-filter: blur(4px); display: flex; align-items: center; justify-content: center; z-index: 1000; padding: 20px; }
-    .modal { background: var(--white); border-radius: var(--r-xl); width: 100%; max-width: 500px; padding: 28px; max-height: 90vh; overflow-y: auto; }
-    .modal-wide { max-width: 800px; }
-    .gallery-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 16px; margin-top: 20px; }
-    .gallery-item { position: relative; background: var(--white); border-radius: var(--r); border: 1px solid var(--border); overflow: hidden; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; aspect-ratio: 1 / 1; display: flex; align-items: center; justify-content: center; background: #f8fafc; }
-    .gallery-item:hover { transform: translateY(-4px); box-shadow: 0 8px 24px rgba(0,0,0,0.1); }
-    .gallery-image { width: 100%; height: 100%; object-fit: cover; display: block; }
-    .gallery-placeholder { font-size: 48px; color: var(--text-mute); }
-    .context-menu { position: fixed; background: var(--white); border-radius: var(--r); box-shadow: 0 8px 24px rgba(0,0,0,0.2); padding: 8px 0; min-width: 180px; z-index: 2000; border: 1px solid var(--border); }
-    .context-menu-item { padding: 10px 16px; font-size: 13px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 12px; }
-    .context-menu-item:hover { background: var(--bg); }
-    .preview-modal { max-width: 90vw; max-height: 90vh; width: auto; background: transparent; box-shadow: none; }
-    .preview-img { max-width: 100%; max-height: 80vh; border-radius: 16px; box-shadow: 0 20px 40px rgba(0,0,0,0.3); }
-    .mobile-friendly-touch { touch-action: manipulation; }
-    @media (max-width: 640px) { .gallery-grid { grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 12px; } }
-  </style>
-  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/cropperjs@1.5.13/dist/cropper.min.js"></script>
+*, *::before, *::after { box-sizing: border-box; }
+html, body { height: 100%; margin: 0; }
+
+body {
+  font-family: var(--font);
+  font-size: 14px;
+  -webkit-font-smoothing: antialiased;
+  letter-spacing: -0.01em;
+  color: var(--text);
+  background: var(--app-bg);
+  background-attachment: fixed;
+  overflow: hidden;
+}
+
+/* ======================== AUTH SCREEN ======================== */
+.auth-overlay {
+  position: fixed; inset: 0;
+  background:
+    radial-gradient(900px 600px at 15% 20%, rgba(99,102,241,0.55), transparent 60%),
+    radial-gradient(900px 600px at 85% 85%, rgba(59,130,246,0.55), transparent 60%),
+    linear-gradient(135deg, #0b1226 0%, #1e1b4b 50%, #0c2657 100%);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 100; padding: 20px;
+  transition: opacity .3s ease;
+}
+.auth-overlay.hidden { display: none; }
+
+.auth-card {
+  width: 100%; max-width: 420px;
+  background: rgba(255,255,255,0.08);
+  backdrop-filter: blur(28px) saturate(160%);
+  -webkit-backdrop-filter: blur(28px) saturate(160%);
+  border: 1px solid rgba(255,255,255,0.18);
+  border-radius: 20px;
+  padding: 40px 36px;
+  box-shadow: 0 30px 80px rgba(0,0,0,0.45);
+  color: #fff;
+}
+.auth-card .brand {
+  display: flex; align-items: center; gap: 12px; justify-content: center;
+  margin-bottom: 6px;
+}
+.auth-card .brand svg { width: 32px; height: 32px; color: #93c5fd; }
+.auth-card .brand h1 {
+  font-family: var(--font-display);
+  font-size: 34px; margin: 0; font-weight: 400;
+  letter-spacing: -0.02em;
+  background: linear-gradient(180deg, #fff, #cbd5e1);
+  -webkit-background-clip: text; background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.auth-card .subtitle {
+  text-align: center; color: rgba(255,255,255,0.6);
+  font-size: 13px; margin: 4px 0 28px;
+}
+.auth-card label {
+  display: block; font-size: 11px; color: rgba(255,255,255,0.6);
+  margin-bottom: 6px; text-transform: uppercase;
+  letter-spacing: 0.08em; font-weight: 600;
+}
+.auth-card input {
+  width: 100%; padding: 12px 14px;
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 10px;
+  font-size: 14px; font-family: var(--font);
+  background: rgba(255,255,255,0.06);
+  color: #fff; margin-bottom: 16px;
+  transition: all .2s;
+  outline: none;
+}
+.auth-card input::placeholder { color: rgba(255,255,255,0.35); }
+.auth-card input:focus {
+  border-color: rgba(147,197,253,0.6);
+  background: rgba(255,255,255,0.10);
+  box-shadow: 0 0 0 4px rgba(147,197,253,0.15);
+}
+.auth-card .btn-row { display: flex; gap: 10px; margin-top: 8px; }
+.auth-card .auth-btn {
+  flex: 1; padding: 12px 14px;
+  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,0.15);
+  background: rgba(255,255,255,0.08);
+  color: #fff; font-family: var(--font);
+  font-size: 14px; font-weight: 600;
+  cursor: pointer; transition: all .15s ease;
+  letter-spacing: -0.005em;
+}
+.auth-card .auth-btn:hover {
+  background: rgba(255,255,255,0.14);
+  transform: translateY(-1px);
+}
+.auth-card .auth-btn:active { transform: translateY(0); }
+.auth-card .auth-btn.primary {
+  background: linear-gradient(180deg, #3b82f6, #2563eb);
+  border-color: rgba(59,130,246,0.6);
+  box-shadow: 0 8px 24px -8px rgba(59,130,246,0.7);
+}
+.auth-card .auth-btn.primary:hover {
+  background: linear-gradient(180deg, #60a5fa, #3b82f6);
+}
+.auth-card .auth-btn:disabled {
+  opacity: .6; cursor: not-allowed; transform: none;
+}
+.auth-card .divider {
+  text-align: center; color: rgba(255,255,255,0.4); font-size: 11px;
+  margin: 20px 0 14px; text-transform: uppercase; letter-spacing: 0.15em;
+  position: relative;
+}
+.auth-card .divider::before, .auth-card .divider::after {
+  content: ""; position: absolute; top: 50%;
+  width: calc(50% - 30px); height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+}
+.auth-card .divider::before { left: 0; }
+.auth-card .divider::after { right: 0; }
+.auth-card .google-btn {
+  width: 100%; padding: 12px 14px;
+  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,0.15);
+  background: rgba(255,255,255,0.08);
+  color: #fff; font-family: var(--font);
+  font-size: 14px; font-weight: 600;
+  cursor: pointer; transition: all .15s ease;
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+}
+.auth-card .google-btn:hover {
+  background: rgba(255,255,255,0.14); transform: translateY(-1px);
+}
+.auth-error {
+  background: rgba(239,68,68,0.2);
+  border: 1px solid rgba(239,68,68,0.4);
+  color: #fca5a5;
+  border-radius: 8px; padding: 10px 12px;
+  font-size: 13px; margin-bottom: 14px;
+  display: none;
+}
+.auth-error.show { display: block; }
+.auth-toggle {
+  text-align: center; margin-top: 16px;
+  font-size: 13px; color: rgba(255,255,255,0.5);
+}
+.auth-toggle a {
+  color: #93c5fd; cursor: pointer; text-decoration: none; font-weight: 600;
+}
+.auth-toggle a:hover { text-decoration: underline; }
+
+/* ======================== WINDOW ======================== */
+.window {
+  width: min(1400px, 96vw); height: min(900px, 94vh);
+  margin: 3vh auto;
+  display: grid;
+  grid-template-rows: 36px auto auto 1fr 28px;
+  background: var(--chrome);
+  backdrop-filter: blur(24px) saturate(160%);
+  -webkit-backdrop-filter: blur(24px) saturate(160%);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+.window.hidden { display: none; }
+
+/* Title bar */
+.titlebar {
+  display: flex; align-items: center;
+  padding: 0 0 0 12px;
+  font-size: 12px; color: var(--text-muted);
+  user-select: none;
+  background: var(--chrome);
+  border-bottom: 1px solid transparent;
+}
+.titlebar .tab {
+  height: 30px; margin-top: 6px; padding: 0 16px;
+  display: flex; align-items: center; gap: 10px;
+  background: var(--chrome-2);
+  border: 1px solid var(--border); border-bottom: 0;
+  border-radius: 10px 10px 0 0;
+  color: var(--text); font-weight: 600; font-size: 12.5px;
+}
+.titlebar .tab svg { width: 14px; height: 14px; color: var(--accent); }
+.titlebar .spacer { flex: 1; }
+.titlebar .winbtns { display: flex; }
+.titlebar .winbtns button {
+  width: 46px; height: 36px;
+  background: transparent; border: 0; color: var(--text-muted);
+  cursor: default; font-family: var(--font); font-size: 13px;
+  transition: background .1s;
+}
+.titlebar .winbtns button:hover { background: rgba(15,23,42,0.06); }
+.titlebar .winbtns button.close-btn:hover { background: #e81123; color: #fff; }
+
+/* Command bar */
+.commandbar {
+  display: flex; align-items: center; gap: 4px;
+  padding: 8px 14px;
+  background: var(--chrome-2);
+  border-bottom: 1px solid var(--border);
+}
+.cmd-btn {
+  display: inline-flex; align-items: center; gap: 7px;
+  padding: 7px 12px; border-radius: 8px;
+  border: 1px solid transparent; background: transparent;
+  color: var(--text); font-family: var(--font);
+  font-size: 13px; font-weight: 500; cursor: pointer;
+  transition: all .15s ease; letter-spacing: -0.005em;
+}
+.cmd-btn:hover { background: rgba(15,23,42,0.05); }
+.cmd-btn:disabled { opacity: .4; cursor: not-allowed; }
+.cmd-btn.primary {
+  background: linear-gradient(180deg, var(--accent), var(--accent-hover));
+  color: #fff; border-color: var(--accent-hover);
+  box-shadow: 0 6px 16px -8px rgba(37,99,235,0.6);
+}
+.cmd-btn.primary:hover { filter: brightness(1.08); transform: translateY(-1px); }
+.cmd-btn svg { width: 16px; height: 16px; }
+.cmd-sep { width: 1px; height: 22px; background: var(--border); margin: 0 6px; }
+
+/* Address bar */
+.addressbar {
+  display: flex; align-items: center; gap: 8px;
+  padding: 6px 12px;
+  background: var(--chrome-2); border-bottom: 1px solid var(--border);
+}
+.nav-arrows { display: flex; gap: 2px; }
+.nav-arrows button {
+  width: 28px; height: 28px; border-radius: var(--radius-sm);
+  border: 0; background: transparent; cursor: pointer;
+  color: var(--text-muted);
+  display: inline-flex; align-items: center; justify-content: center;
+  transition: background .1s;
+}
+.nav-arrows button:hover:not(:disabled) { background: rgba(0,0,0,0.06); color: var(--text); }
+.nav-arrows button:disabled { opacity: .35; cursor: default; }
+.nav-arrows svg { width: 14px; height: 14px; }
+.crumbs {
+  flex: 1; display: flex; align-items: center;
+  background: var(--bg); border: 1px solid var(--border);
+  border-radius: var(--radius-sm); padding: 4px 8px; gap: 4px; overflow: hidden;
+}
+.crumb { display: inline-flex; align-items: center; gap: 4px; padding: 2px 6px; border-radius: 4px; }
+.crumb svg { width: 14px; height: 14px; color: var(--accent); }
+.crumb-sep { color: var(--text-faint); font-size: 10px; }
+.searchbox {
+  display: flex; align-items: center; gap: 6px;
+  background: var(--bg); border: 1px solid var(--border);
+  border-radius: var(--radius-sm); padding: 4px 10px; width: 240px;
+}
+.searchbox input {
+  border: 0; outline: 0; background: transparent;
+  flex: 1; color: var(--text); font-family: var(--font); font-size: 13px;
+}
+.searchbox svg { width: 14px; height: 14px; color: var(--text-faint); }
+
+/* Body */
+.body {
+  display: grid; grid-template-columns: 240px 1fr;
+  background: var(--panel); min-height: 0;
+}
+.sidebar {
+  border-right: 1px solid var(--border);
+  background: var(--chrome); padding: 8px 6px; overflow-y: auto;
+}
+.side-group { margin-bottom: 8px; }
+.side-group-title {
+  font-size: 10px; text-transform: uppercase; letter-spacing: 0.12em;
+  color: var(--text-faint); font-weight: 700; padding: 10px 12px 6px;
+}
+.side-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 6px 10px; border-radius: var(--radius-sm);
+  cursor: pointer; color: var(--text); font-size: 13px;
+  transition: background .1s; position: relative;
+}
+.side-item:hover { background: rgba(0,0,0,0.05); }
+.side-item.active {
+  background: var(--accent-soft-2); font-weight: 600;
+}
+.side-item.active::before {
+  content: ""; position: absolute; left: 2px; top: 6px; bottom: 6px;
+  width: 3px; background: var(--accent); border-radius: 2px;
+}
+.side-item svg { width: 16px; height: 16px; color: var(--accent); flex-shrink: 0; }
+
+/* Main pane */
+.main { display: flex; flex-direction: column; min-width: 0; min-height: 0; }
+.main-toolbar {
+  display: flex; align-items: center; gap: 6px;
+  padding: 6px 14px; border-bottom: 1px solid var(--border);
+  background: var(--chrome-2); font-size: 12px; color: var(--text-muted);
+}
+.view-toggle { display: flex; gap: 2px; margin-left: auto; }
+.view-toggle button {
+  width: 28px; height: 26px; border: 0;
+  border-radius: var(--radius-sm); background: transparent;
+  color: var(--text-muted); cursor: pointer;
+  display: inline-flex; align-items: center; justify-content: center;
+  transition: all .1s;
+}
+.view-toggle button:hover { background: rgba(0,0,0,0.06); color: var(--text); }
+.view-toggle button.active { background: var(--accent-soft); color: var(--accent); }
+.view-toggle svg { width: 15px; height: 15px; }
+
+.filearea {
+  flex: 1; overflow: auto; padding: 12px 14px 20px;
+  position: relative;
+}
+.filearea.drag-over { outline: 2px dashed var(--accent); outline-offset: -12px; background: var(--accent-soft-2); }
+
+/* Grid view */
+.files-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+  gap: 4px;
+}
+.file-card {
+  padding: 12px 6px 10px; border-radius: var(--radius-sm);
+  text-align: center; cursor: default; user-select: none;
+  border: 1px solid transparent; transition: background .1s;
+}
+.file-card:hover { background: rgba(0,0,0,0.04); }
+.file-card.selected { background: var(--selection); border-color: var(--selection-border); }
+.file-card .icon { width: 56px; height: 56px; margin: 0 auto 6px; display: flex; align-items: center; justify-content: center; }
+.file-card .icon svg { width: 100%; height: 100%; }
+.file-card .name { font-size: 12px; word-break: break-word; line-height: 1.3; max-height: 2.6em; overflow: hidden; }
+
+/* List view */
+.files-list { width: 100%; }
+.files-list .row-head, .files-list .row {
+  display: grid;
+  grid-template-columns: 1fr 150px 100px 80px;
+  align-items: center; padding: 6px 10px;
+  font-size: 13px; border-radius: 4px;
+}
+.files-list .row-head {
+  font-size: 12px; color: var(--text-faint);
+  border-bottom: 1px solid var(--border); font-weight: 600; border-radius: 0;
+  position: sticky; top: 0; background: var(--panel); z-index: 1;
+}
+.files-list .row { cursor: default; transition: background .1s; }
+.files-list .row:hover { background: rgba(0,0,0,0.04); }
+.files-list .row.selected { background: var(--selection); }
+.files-list .name-cell { display: flex; align-items: center; gap: 10px; min-width: 0; }
+.files-list .name-cell svg { width: 20px; height: 20px; flex-shrink: 0; }
+.files-list .name-cell span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+/* Empty state */
+.empty-state {
+  text-align: center; padding: 72px 20px;
+  color: var(--text-faint);
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  height: 100%;
+}
+.empty-state .big-icon { font-size: 64px; margin-bottom: 14px; opacity: .55; }
+.empty-state h3 {
+  margin: 8px 0 6px; color: var(--text-muted);
+  font-family: var(--font-display); font-weight: 400;
+  font-size: 26px; letter-spacing: -0.01em;
+}
+.empty-state p { font-size: 13px; color: var(--text-faint); margin: 0 0 20px; }
+.empty-upload-btn {
+  display: inline-flex; align-items: center; gap: 10px;
+  padding: 14px 28px; border-radius: 12px;
+  background: linear-gradient(180deg, var(--accent), var(--accent-hover));
+  color: #fff; border: none; font-family: var(--font);
+  font-size: 15px; font-weight: 600; cursor: pointer;
+  box-shadow: 0 8px 24px -8px rgba(37,99,235,0.6);
+  transition: all .2s ease; letter-spacing: -0.01em;
+}
+.empty-upload-btn:hover { filter: brightness(1.1); transform: translateY(-2px); box-shadow: 0 12px 30px -8px rgba(37,99,235,0.7); }
+.empty-upload-btn:active { transform: translateY(0); }
+.empty-upload-btn svg { width: 20px; height: 20px; }
+
+/* Status bar */
+.statusbar {
+  border-top: 1px solid var(--border); background: var(--chrome-2);
+  padding: 4px 14px; display: flex; align-items: center; gap: 16px;
+  font-size: 12px; color: var(--text-muted);
+}
+.statusbar .right { margin-left: auto; display: flex; align-items: center; gap: 12px; }
+
+/* User chip */
+.user-chip {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 4px 10px 4px 4px; border-radius: 20px;
+  background: var(--bg); border: 1px solid var(--border); font-size: 12px;
+}
+.user-chip .avatar {
+  width: 24px; height: 24px; border-radius: 50%;
+  background: var(--accent); color: #fff;
+  display: inline-flex; align-items: center; justify-content: center;
+  font-weight: 700; font-size: 11px;
+}
+.user-chip .signout {
+  border: 0; background: transparent; color: var(--text-faint);
+  cursor: pointer; padding: 0 2px; font-size: 12px; font-family: var(--font);
+  transition: color .1s;
+}
+.user-chip .signout:hover { color: #e81123; }
+
+/* Toast */
+.toast {
+  position: fixed; bottom: 40px; left: 50%; transform: translateX(-50%) translateY(8px);
+  background: var(--text); color: var(--panel);
+  padding: 10px 18px; border-radius: 8px; font-size: 13px;
+  box-shadow: var(--shadow); opacity: 0; pointer-events: none;
+  transition: opacity .2s, transform .2s; z-index: 999;
+}
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+/* Loading spinner */
+.spinner {
+  width: 36px; height: 36px; margin: 0 auto 16px;
+  border: 3px solid var(--border); border-top-color: var(--accent);
+  border-radius: 50%; animation: spin .8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* Scrollbars */
+::-webkit-scrollbar { width: 12px; }
+::-webkit-scrollbar-thumb {
+  background: transparent; border: 3px solid transparent;
+  border-radius: 8px; background-clip: padding-box;
+}
+*:hover > ::-webkit-scrollbar-thumb,
+.filearea::-webkit-scrollbar-thumb,
+.sidebar::-webkit-scrollbar-thumb {
+  background: rgba(0,0,0,0.18);
+  border: 3px solid transparent; background-clip: padding-box;
+}
+</style>
 </head>
 <body>
 
-<div class="login-screen" id="login-screen" style="display:none"></div>
-<div class="layout" id="app-layout" style="display:none">
-  <aside class="sidebar" id="sidebar">
-    <div class="sidebar-brand"><div class="brand-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div><div><div class="brand-title">Classroom</div><div class="brand-sub">Attendance & Gallery</div></div></div>
-    <nav class="nav">
-      <button class="nav-item active" data-page="attendance"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg><span>Attendance</span></button>
-      <button class="nav-item" data-page="roster"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg><span>Roster</span></button>
-      <button class="nav-item" data-page="gallery"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="2"/><circle cx="8.5" cy="8.5" r="2.5"/><path d="M21 15l-5-4-3 3-4-4-5 5"/></svg><span>Gallery</span></button>
-      <button class="nav-item" data-page="summary"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg><span>Summary</span></button>
-      <button class="nav-item" data-page="classes"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg><span>My Classes</span></button>
-      <button class="nav-item" data-page="chat"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg><span>Chat</span></button>
-      <div class="nav-spacer"></div>
-      <button class="nav-item" data-page="settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg><span>Settings</span></button>
-      <button class="nav-item" id="logout-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg><span>Sign Out</span></button>
-    </nav>
-  </aside>
-  <main class="main" id="main"><div class="loading-full"><div class="spinner"></div></div></main>
+<!-- =================== AUTH SCREEN =================== -->
+<div id="auth-screen" class="auth-overlay">
+  <div class="auth-card">
+    <div class="brand">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M10 4H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-8l-2-2z"/></svg>
+      <h1>DigiLocker</h1>
+    </div>
+    <p class="subtitle">Sign in to access your secure documents</p>
+
+    <div id="auth-error" class="auth-error"></div>
+
+    <label for="email">Email</label>
+    <input type="email" id="email" placeholder="you@example.com" autocomplete="email" />
+
+    <label for="password">Password</label>
+    <input type="password" id="password" placeholder="••••••••" autocomplete="current-password" />
+
+    <div class="btn-row">
+      <button class="auth-btn primary" id="login-btn">Sign in</button>
+      <button class="auth-btn" id="signup-btn">Create account</button>
+    </div>
+
+    <div class="divider">or</div>
+
+    <button id="google-btn" class="google-btn">
+      <svg width="16" height="16" viewBox="0 0 18 18">
+        <path d="M17.64 9.2c0-.63-.06-1.25-.16-1.84H9v3.47h4.84c-.21 1.12-.84 2.07-1.79 2.7l2.79 2.16c1.63-1.51 2.57-3.73 2.57-6.39z" fill="#4285F4"/>
+        <path d="M9 18c2.43 0 4.47-.8 5.96-2.18l-2.79-2.16c-.78.52-1.78.83-3.17.83-2.44 0-4.51-1.65-5.25-3.87H.83v2.2C2.32 15.8 5.4 18 9 18z" fill="#34A853"/>
+        <path d="M3.75 10.62c-.19-.57-.3-1.18-.3-1.82s.11-1.25.3-1.82V4.78H.83C.3 5.83 0 7.01 0 8.25s.3 2.42.83 3.47l2.92-2.1z" fill="#FBBC05"/>
+        <path d="M9 3.58c1.32 0 2.5.45 3.44 1.35l2.58-2.58C13.46.8 11.43 0 9 0 5.4 0 2.32 2.2 1.83 4.78l2.92 2.2c.74-2.22 2.81-3.87 5.25-3.87z" fill="#EA4335"/>
+      </svg>
+      Continue with Google
+    </button>
+
+    <div class="auth-toggle">
+      <span id="auth-switch-text">Don't have an account?</span>
+      <a id="auth-switch-link"> Sign up</a>
+    </div>
+  </div>
 </div>
-<div class="toast-container" id="toast-container"></div>
 
-<!-- Modals (original add student/class plus new gallery upload) -->
-<div class="modal-overlay" id="modal-add-student" style="display:none"><div class="modal"><div class="modal-header"><h2 class="modal-title">Add Student</h2><button class="modal-close" onclick="window.closeAddModal?.()">&times;</button></div><form id="add-student-form"><div class="form-group"><label class="form-label">Name *</label><input type="text" id="student-name" class="form-input" required></div><div class="form-group"><label>Grade</label><input type="text" id="student-grade" class="form-input"></div><div class="form-group"><label>Notes</label><input type="text" id="student-notes" class="form-input"></div><div class="form-actions"><button type="button" class="btn btn-ghost" onclick="window.closeAddModal?.()">Cancel</button><button type="submit" class="btn btn-primary">Save</button></div></form></div></div>
-<div class="modal-overlay" id="modal-add-class" style="display:none"><div class="modal"><div class="modal-header"><h2 class="modal-title">Create Class</h2><button class="modal-close" onclick="window.closeClassModal?.()">&times;</button></div><form id="add-class-form"><div class="form-group"><label>Class Name *</label><input type="text" id="new-class-name" required></div><div class="form-group"><label>School Name</label><input type="text" id="new-class-school"></div><div class="form-group"><label>Grade</label><input type="text" id="new-class-grade"></div><div class="form-actions"><button type="button" class="btn btn-ghost" onclick="window.closeClassModal?.()">Cancel</button><button type="submit" class="btn btn-primary">Create</button></div></form></div></div>
-<div class="modal-overlay" id="modal-gallery-upload" style="display:none"><div class="modal modal-wide"><div class="modal-header"><h2 class="modal-title">📸 Add Image to Gallery</h2><button class="modal-close" id="close-upload-modal">&times;</button></div><input type="file" id="gallery-file-input" accept="image/*" style="margin-bottom: 16px;"><div style="margin: 16px 0;"><label>Image Title (optional)</label><input type="text" id="gallery-title" class="form-input" placeholder="e.g., Field Trip"></div><div class="form-actions"><button class="btn btn-ghost" id="cancel-upload">Cancel</button><button class="btn btn-primary" id="confirm-upload">Upload</button></div></div></div>
-<div class="modal-overlay" id="modal-birthday" style="display:none"><div class="modal" style="text-align:center"><div style="font-size:64px">🎂</div><div id="birthday-message"></div><button class="btn btn-primary" onclick="document.getElementById('modal-birthday').style.display='none'">🎉 Yay!</button></div></div>
+<!-- =================== DASHBOARD =================== -->
+<div id="dashboard-screen" class="window hidden">
 
-<script>
-  // ------------------------- ORIGINAL APP DATA & HELPERS (preserved fully) -------------------------
-  const THEMES = { teal: { name: 'Teal', primary: '#0d9488' } };
-  const STUDENT_AVATARS = [{ id: 'avatar1', emoji: '😀', color: '#0d9488' }];
-  const ACHIEVEMENTS = [{ id: 'perfect_week', name: 'Perfect Week', icon: '🌟', description: 'Perfect attendance' }];
-  const BANNER_PRESETS = [{ id: 'none', name: 'No Banner', icon: '🚫', gradient: 'transparent' }];
-  const SIDEBAR_PRESETS = [{ name: 'Deep Teal', gradient: 'linear-gradient(135deg, #0b1f1d, #0d9488)' }];
+  <!-- Title bar -->
+  <div class="titlebar">
+    <div class="tab">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M10 4H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-8l-2-2z"/></svg>
+      DigiLocker
+    </div>
+    <div class="spacer"></div>
+    <div class="winbtns">
+      <button title="Minimize">&#8211;</button>
+      <button title="Maximize">&#9633;</button>
+      <button class="close-btn" title="Close">&#10005;</button>
+    </div>
+  </div>
 
-  function toast(msg, type='') { const c=document.getElementById('toast-container'); if(c){ let d=document.createElement('div'); d.className='toast'+(type?' '+type:''); d.textContent=msg; c.appendChild(d); setTimeout(()=>d.remove(),3200);} }
-  function esc(s){ return String(s??'').replace(/[&<>]/g,function(m){if(m==='&')return'&amp;';if(m==='<')return'&lt;';if(m==='>')return'&gt;';return m;}); }
-  function todayStr(){ return new Date().toISOString().slice(0,10); }
-  function formatDate(str){ if(!str) return ''; const [y,m,d]=str.split('-'); return new Date(y,m-1,d).toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'}); }
-  function generateClassCode(){ return Math.random().toString(36).substring(2,8).toUpperCase(); }
-  
-  let currentUser=null, currentPage='attendance', currentDate=todayStr(), currentClassId=1;
-  function initData(){
-    if(!localStorage.getItem('students')) localStorage.setItem('students',JSON.stringify([{id:1,name:'Emma Johnson',grade:'3rd Grade',notes:''},{id:2,name:'Liam Smith',grade:'3rd Grade',notes:''}]));
-    if(!localStorage.getItem('attendance')) localStorage.setItem('attendance','[]');
-    if(!localStorage.getItem('classes')) localStorage.setItem('classes',JSON.stringify([{id:1,name:'My Class',schoolName:'My School',grade:'3rd Grade',classCode:'ABC123'}]));
-    if(!localStorage.getItem('users')) localStorage.setItem('users',JSON.stringify([{username:'teacher',password:'123',role:'teacher',name:'Ms. Johnson'},{username:'student',password:'123',role:'student',studentId:1,name:'Emma Johnson'}]));
-    if(!localStorage.getItem('gallery_items')) localStorage.setItem('gallery_items',JSON.stringify([]));
+  <!-- Command bar -->
+  <div class="commandbar">
+    <button class="cmd-btn primary" id="cmd-upload">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+      Upload
+    </button>
+    <button class="cmd-btn" id="cmd-new-folder" title="Coming soon" disabled>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/><line x1="12" y1="11" x2="12" y2="17"/><line x1="9" y1="14" x2="15" y2="14"/></svg>
+      New folder
+    </button>
+    <div class="cmd-sep"></div>
+    <button class="cmd-btn" id="cmd-refresh">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+      Refresh
+    </button>
+    <button class="cmd-btn" id="cmd-download" disabled>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      Download
+    </button>
+    <button class="cmd-btn" id="cmd-delete" disabled style="color:#ef4444">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+      Delete
+    </button>
+    <div style="flex:1"></div>
+    <div id="user-chip" class="user-chip">
+      <span class="avatar" id="user-avatar">?</span>
+      <span id="user-display">user</span>
+      <button class="signout" id="logout-btn">Sign out</button>
+    </div>
+  </div>
+
+  <!-- Address bar -->
+  <div class="addressbar">
+    <div class="nav-arrows">
+      <button disabled title="Back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
+      <button disabled title="Forward"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></button>
+      <button disabled title="Up"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg></button>
+    </div>
+    <div class="crumbs">
+      <span class="crumb">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M10 4H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-8l-2-2z"/></svg>
+        DigiLocker
+      </span>
+      <span class="crumb-sep">›</span>
+      <span class="crumb">My Documents</span>
+    </div>
+    <div class="searchbox">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input type="text" id="search-input" placeholder="Search documents" />
+    </div>
+  </div>
+
+  <!-- Body -->
+  <div class="body">
+    <aside class="sidebar">
+      <div class="side-group">
+        <div class="side-group-title">Quick access</div>
+        <div class="side-item active">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M10 4H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-8l-2-2z"/></svg>
+          My Documents
+        </div>
+        <div class="side-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          Starred
+        </div>
+        <div class="side-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          Recent
+        </div>
+        <div class="side-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+          Shared with me
+        </div>
+      </div>
+      <div class="side-group">
+        <div class="side-group-title">Categories</div>
+        <div class="side-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="12" cy="10" r="3"/><path d="M7 20v-2a4 4 0 0 1 4-4h2a4 4 0 0 1 4 4v2"/></svg>
+          Identity
+        </div>
+        <div class="side-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+          Certificates
+        </div>
+        <div class="side-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+          Finance
+        </div>
+        <div class="side-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+          Property
+        </div>
+      </div>
+      <div class="side-group">
+        <div class="side-group-title">This PC</div>
+        <div class="side-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
+          Cloud (C:)
+        </div>
+      </div>
+    </aside>
+
+    <section class="main">
+      <div class="main-toolbar">
+        <span id="item-count">0 items</span>
+        <div class="view-toggle">
+          <button class="active" data-view="grid" title="Large icons">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+          </button>
+          <button data-view="details" title="Details">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+          </button>
+        </div>
+      </div>
+      <div id="filearea" class="filearea">
+        <div class="empty-state">
+          <div class="spinner"></div>
+          <h3>Loading…</h3>
+        </div>
+      </div>
+      <input type="file" id="file-picker" multiple hidden />
+    </section>
+  </div>
+
+  <!-- Status bar -->
+  <div class="statusbar">
+    <span id="status-text">Ready</span>
+    <div class="right">
+      <span id="selected-info"></span>
+      <span>DigiLocker · powered by Supabase ⚡</span>
+    </div>
+  </div>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<!-- =================== FIREBASE LOGIC =================== -->
+<script type="module">
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+
+// ---- Supabase config ----
+const SUPABASE_URL    = "https://edvrzshtnralwsvlgbzo.supabase.co";
+const SUPABASE_ANON   = "sb_publishable_iRsFPQktJ9G6i6FPQSFewA_139c0SeP";
+const BUCKET          = "documents";
+
+const supabase = createClient(SUPABASE_URL, SUPABASE_ANON);
+
+// ---- DOM helpers ----
+const $ = id => document.getElementById(id);
+
+const authScreen    = $('auth-screen');
+const dashboard     = $('dashboard-screen');
+const emailInput    = $('email');
+const passwordInput = $('password');
+const filearea      = $('filearea');
+const filePicker    = $('file-picker');
+const userDisplay   = $('user-display');
+const userAvatar    = $('user-avatar');
+const statusText    = $('status-text');
+const itemCount     = $('item-count');
+const selectedInfo  = $('selected-info');
+const toast         = $('toast');
+const searchInput   = $('search-input');
+const authError     = $('auth-error');
+
+let currentView = 'grid';
+let allFiles = [];
+let selectedFiles = new Set();
+let isSignUpMode = false;
+
+// ---- Utilities ----
+function showToast(msg) {
+  toast.textContent = msg;
+  toast.classList.add('show');
+  clearTimeout(showToast._t);
+  showToast._t = setTimeout(() => toast.classList.remove('show'), 2800);
+}
+
+function showAuthError(msg) {
+  authError.textContent = msg;
+  authError.classList.add('show');
+}
+function clearAuthError() {
+  authError.textContent = '';
+  authError.classList.remove('show');
+}
+
+function setAuthLoading(loading) {
+  $('login-btn').disabled = loading;
+  $('signup-btn').disabled = loading;
+  $('google-btn').disabled = loading;
+  $('login-btn').textContent = loading && !isSignUpMode ? 'Signing in…' : (isSignUpMode ? 'Sign in' : 'Sign in');
+  $('signup-btn').textContent = loading && isSignUpMode ? 'Creating…' : (isSignUpMode ? 'Sign in' : 'Create account');
+}
+
+function formatBytes(bytes) {
+  if (!bytes) return '—';
+  const u = ['B','KB','MB','GB']; let i = 0;
+  while (bytes >= 1024 && i < u.length - 1) { bytes /= 1024; i++; }
+  return bytes.toFixed(i === 0 ? 0 : 1) + ' ' + u[i];
+}
+
+function formatDate(d) {
+  if (!d) return '—';
+  return new Date(d).toLocaleDateString(undefined, { year:'numeric', month:'short', day:'numeric' })
+    + ' ' + new Date(d).toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' });
+}
+
+function getExt(name) {
+  const i = name.lastIndexOf('.');
+  return i >= 0 ? name.slice(i + 1).toLowerCase() : '';
+}
+
+function fileTypeLabel(ext) {
+  const map = {
+    pdf:'PDF Document', jpg:'JPEG Image', jpeg:'JPEG Image', png:'PNG Image',
+    gif:'GIF Image', webp:'WebP Image', doc:'Word Document', docx:'Word Document',
+    xls:'Excel Sheet', xlsx:'Excel Sheet', txt:'Text File',
+    zip:'Compressed', mp4:'Video', mp3:'Audio'
+  };
+  return map[ext] || (ext ? ext.toUpperCase() + ' File' : 'File');
+}
+
+function fileIcon(ext) {
+  const colors = {
+    pdf:'#e53935', doc:'#1565c0', docx:'#1565c0',
+    xls:'#2e7d32', xlsx:'#2e7d32',
+    jpg:'#8e24aa', jpeg:'#8e24aa', png:'#8e24aa', gif:'#8e24aa', webp:'#8e24aa',
+    zip:'#f9a825', txt:'#616161', mp4:'#d81b60', mp3:'#00838f'
+  };
+  const color = colors[ext] || '#0067c0';
+  const label = (ext || 'FILE').toUpperCase().slice(0, 4);
+  const uid = `g${Math.random().toString(36).slice(2,6)}`;
+  return `<svg viewBox="0 0 64 80" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <linearGradient id="${uid}" x1="0" x2="0" y1="0" y2="1">
+        <stop offset="0" stop-color="#ffffff"/>
+        <stop offset="1" stop-color="#eaeaea"/>
+      </linearGradient>
+    </defs>
+    <path d="M8 2H40L56 18V74a4 4 0 0 1-4 4H8a4 4 0 0 1-4-4V6a4 4 0 0 1 4-4z" fill="url(#${uid})" stroke="#bdbdbd" stroke-width="1"/>
+    <path d="M40 2V18H56z" fill="#cfd8dc" stroke="#bdbdbd" stroke-width="1"/>
+    <rect x="4" y="44" width="48" height="22" rx="2" fill="${color}"/>
+    <text x="28" y="59" text-anchor="middle" fill="#fff" font-family="Segoe UI,Arial,sans-serif" font-weight="700" font-size="11">${label}</text>
+  </svg>`;
+}
+
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+}
+
+// ---- Auth UI mode toggle ----
+function updateAuthMode() {
+  $('login-btn').textContent         = isSignUpMode ? 'Sign in'        : 'Sign in';
+  $('signup-btn').textContent        = isSignUpMode ? 'Create account' : 'Create account';
+  $('auth-switch-text').textContent  = isSignUpMode ? 'Already have an account?' : "Don't have an account?";
+  $('auth-switch-link').textContent  = isSignUpMode ? ' Sign in' : ' Sign up';
+}
+
+$('auth-switch-link').addEventListener('click', () => {
+  isSignUpMode = !isSignUpMode;
+  clearAuthError();
+  updateAuthMode();
+});
+
+// ---- Auth handlers ----
+$('login-btn').addEventListener('click', async () => {
+  clearAuthError();
+  const email = emailInput.value.trim();
+  const pass  = passwordInput.value;
+  if (!email || !pass) { showAuthError('please enter your email and password.'); return; }
+  setAuthLoading(true);
+  const { error } = await supabase.auth.signInWithPassword({ email, password: pass });
+  if (error) showAuthError(friendlyError(error.message));
+  setAuthLoading(false);
+});
+
+$('signup-btn').addEventListener('click', async () => {
+  clearAuthError();
+  const email = emailInput.value.trim();
+  const pass  = passwordInput.value;
+  if (!email || !pass) { showAuthError('please enter your email and password.'); return; }
+  if (pass.length < 6) { showAuthError('password must be at least 6 characters.'); return; }
+  setAuthLoading(true);
+  const { error } = await supabase.auth.signUp({ email, password: pass });
+  if (error) showAuthError(friendlyError(error.message));
+  else showToast('✅ account created! check your email to confirm, then sign in.');
+  setAuthLoading(false);
+});
+
+$('google-btn').addEventListener('click', async () => {
+  clearAuthError();
+  const { error } = await supabase.auth.signInWithOAuth({
+    provider: 'google',
+    options: { redirectTo: window.location.href }
+  });
+  if (error) showAuthError(friendlyError(error.message));
+});
+
+$('logout-btn').addEventListener('click', async () => {
+  await supabase.auth.signOut();
+  showToast('signed out. see ya! 👋');
+});
+
+function friendlyError(msg) {
+  if (!msg) return 'something went wrong. please try again.';
+  const m = msg.toLowerCase();
+  if (m.includes('invalid login') || m.includes('invalid credentials')) return 'incorrect email or password.';
+  if (m.includes('email not confirmed')) return 'please confirm your email first — check your inbox!';
+  if (m.includes('already registered') || m.includes('already exists')) return 'an account with that email already exists.';
+  if (m.includes('password')) return 'password should be at least 6 characters.';
+  if (m.includes('rate limit')) return 'too many attempts. please wait a moment.';
+  if (m.includes('network') || m.includes('fetch')) return 'network error. check your connection.';
+  return msg;
+}
+
+[emailInput, passwordInput].forEach(el =>
+  el.addEventListener('keydown', e => { if (e.key === 'Enter') $('login-btn').click(); }));
+
+// ---- Session listener ----
+supabase.auth.onAuthStateChange((_event, session) => {
+  const user = session?.user ?? null;
+  if (user) {
+    authScreen.classList.add('hidden');
+    dashboard.classList.remove('hidden');
+    const name = user.user_metadata?.full_name || user.email || 'user';
+    userDisplay.textContent = name;
+    userAvatar.textContent  = (name[0] || '?').toUpperCase();
+    loadDocuments(user.id);
+  } else {
+    authScreen.classList.remove('hidden');
+    dashboard.classList.add('hidden');
+    allFiles = [];
+    selectedFiles.clear();
   }
-  function getStudents(){ return JSON.parse(localStorage.getItem('students')||'[]'); }
-  function addStudent(s){ let stu=getStudents(); let newS={...s,id:Date.now()}; stu.push(newS); localStorage.setItem('students',JSON.stringify(stu)); return newS; }
-  function updateStudent(id,data){ let stu=getStudents(); let idx=stu.findIndex(s=>s.id===id); if(idx!==-1){ stu[idx]={...stu[idx],...data}; localStorage.setItem('students',JSON.stringify(stu)); return stu[idx];} return null; }
-  function deleteStudent(id){ let stu=getStudents().filter(s=>s.id!==id); localStorage.setItem('students',JSON.stringify(stu)); let att=JSON.parse(localStorage.getItem('attendance')||'[]').filter(a=>a.studentId!==id); localStorage.setItem('attendance',JSON.stringify(att)); }
-  function getAttendance(date,studentId){ let att=JSON.parse(localStorage.getItem('attendance')||'[]'); if(date) att=att.filter(a=>a.date===date); if(studentId) att=att.filter(a=>a.studentId===studentId); return att; }
-  function saveAttendance(r){ let att=JSON.parse(localStorage.getItem('attendance')||'[]'); let idx=att.findIndex(a=>a.studentId===r.studentId&&a.date===r.date); if(idx!==-1) att[idx]={...att[idx],...r}; else att.push({...r,id:Date.now()}); localStorage.setItem('attendance',JSON.stringify(att)); return r; }
-  function getClasses(){ return JSON.parse(localStorage.getItem('classes')||'[]'); }
-  function addClass(cls){ let classes=getClasses(); let newC={...cls,id:Date.now(),classCode:generateClassCode()}; classes.push(newC); localStorage.setItem('classes',JSON.stringify(classes)); return newC; }
-  function getClassByCode(code){ return getClasses().find(c=>c.classCode===code); }
-  function getAttendanceSummary(){ let students=getStudents(); let att=JSON.parse(localStorage.getItem('attendance')||'[]'); return students.map(s=>({studentId:s.id,studentName:s.name,present:att.filter(a=>a.studentId===s.id&&a.status==='present').length,absent:att.filter(a=>a.studentId===s.id&&a.status==='absent').length,late:att.filter(a=>a.studentId===s.id&&a.status==='late').length,total:att.filter(a=>a.studentId===s.id).length})); }
-  function updateUserName(uid,newName){ let users=JSON.parse(localStorage.getItem('users')||'[]'); let u=users.find(u=>u.username===uid||u.studentId===uid); if(u){ u.name=newName; localStorage.setItem('users',JSON.stringify(users)); if(u.role==='student'&&u.studentId) updateStudent(u.studentId,{name:newName}); return true;} return false; }
-  initData();
+});
 
-  // Gallery functions (pure localStorage)
-  function getGalleryItems(){ return JSON.parse(localStorage.getItem('gallery_items')||'[]'); }
-  function addGalleryItem(title, dataUrl){ let items=getGalleryItems(); items.push({id:Date.now(), title:title||'Untitled', imageData:dataUrl, createdAt:new Date().toISOString()}); localStorage.setItem('gallery_items',JSON.stringify(items)); toast('Image added to gallery!','success'); renderGallery(); }
-  function deleteGalleryItem(id){ let items=getGalleryItems().filter(i=>i.id!==id); localStorage.setItem('gallery_items',JSON.stringify(items)); toast('Image deleted','success'); renderGallery(); }
-  
-  async function renderGallery(){
-    const main=document.getElementById('main');
-    const items=getGalleryItems();
-    main.innerHTML=`
-      <div class="page-header"><div><div class="page-title">🖼️ Class Gallery</div><div class="page-sub">View all images — double-tap or right-click for options</div></div><button class="btn btn-primary" id="gallery-upload-btn">➕ Add Image</button></div>
-      <div class="card"><div class="card-header"><span>Images (${items.length})</span></div><div class="gallery-grid" id="gallery-grid">${items.length===0?'<div class="empty-state"><div class="empty-icon">📸</div><div class="empty-title">No images yet</div><div class="empty-sub">Click "Add Image" to upload photos</div></div>':items.map(item=>`<div class="gallery-item" data-id="${item.id}"><img class="gallery-image" src="${esc(item.imageData)}" alt="${esc(item.title)}" loading="lazy"><div style="position:absolute;bottom:6px;left:6px;background:rgba(0,0,0,0.6);color:white;padding:2px 8px;border-radius:20px;font-size:10px;">${esc(item.title||'Image')}</div></div>`).join('')}</div></div>
-    `;
-    document.getElementById('gallery-upload-btn')?.addEventListener('click',()=>{ document.getElementById('modal-gallery-upload').style.display='flex'; });
-    document.querySelectorAll('.gallery-item').forEach(el=>{
-      el.addEventListener('click',(e)=>{ e.stopPropagation(); const id=parseInt(el.dataset.id); const item=getGalleryItems().find(i=>i.id===id); if(item) showImagePreview(item.imageData, item.title); });
-      // Double-tap context menu simulation also works via global handler
+// ---- Upload ----
+$('cmd-upload').addEventListener('click', () => filePicker.click());
+filePicker.addEventListener('change', () => { if (filePicker.files.length) handleFiles(filePicker.files); });
+
+filearea.addEventListener('dragover', e => { e.preventDefault(); filearea.classList.add('drag-over'); });
+filearea.addEventListener('dragleave', () => filearea.classList.remove('drag-over'));
+filearea.addEventListener('drop', e => {
+  e.preventDefault(); filearea.classList.remove('drag-over');
+  handleFiles(e.dataTransfer.files);
+});
+
+async function handleFiles(fileList) {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user || !fileList?.length) return;
+  const files = Array.from(fileList);
+  statusText.textContent = `uploading ${files.length} file${files.length > 1 ? 's' : ''}…`;
+  let failed = 0;
+  for (const file of files) {
+    const path = `${user.id}/${file.name}`;
+    const { error } = await supabase.storage.from(BUCKET).upload(path, file, { upsert: true });
+    if (error) { failed++; console.error(error); }
+  }
+  filePicker.value = '';
+  if (failed) showToast(`⚠️ ${failed} file(s) failed to upload`);
+  else showToast(`✅ uploaded ${files.length} file${files.length > 1 ? 's' : ''}!`);
+  statusText.textContent = failed ? 'upload had errors' : 'upload complete';
+  loadDocuments(user.id);
+}
+
+// ---- Refresh ----
+$('cmd-refresh').addEventListener('click', async () => {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (user) loadDocuments(user.id);
+});
+
+// ---- Download ----
+$('cmd-download').addEventListener('click', () => {
+  selectedFiles.forEach(name => {
+    const f = allFiles.find(x => x.name === name);
+    if (f?.url) window.open(f.url, '_blank');
+  });
+});
+
+// ---- Delete ----
+$('cmd-delete').addEventListener('click', async () => {
+  if (!selectedFiles.size) return;
+  const names = [...selectedFiles];
+  if (!window.confirm(`delete ${names.length} file${names.length > 1 ? 's' : ''}? this cannot be undone.`)) return;
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return;
+  statusText.textContent = 'deleting…';
+  const paths = names.map(n => `${user.id}/${n}`);
+  const { error } = await supabase.storage.from(BUCKET).remove(paths);
+  if (error) { showToast('❌ ' + error.message); statusText.textContent = 'delete failed'; return; }
+  showToast(`🗑️ deleted ${names.length} file${names.length > 1 ? 's' : ''}`);
+  loadDocuments(user.id);
+});
+
+// ---- View toggle ----
+document.querySelectorAll('.view-toggle button').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.view-toggle button').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    currentView = btn.dataset.view;
+    render();
+  });
+});
+
+searchInput.addEventListener('input', render);
+
+// ---- Load documents ----
+async function loadDocuments(uid) {
+  filearea.innerHTML = `<div class="empty-state"><div class="spinner"></div><h3>loading your documents…</h3></div>`;
+  statusText.textContent = 'loading…';
+  const { data, error } = await supabase.storage.from(BUCKET).list(uid, { limit: 500, sortBy: { column: 'name', order: 'asc' } });
+  if (error) {
+    filearea.innerHTML = `<div class="empty-state"><div class="big-icon">⚠️</div><h3>couldn't load files</h3><p>${escapeHtml(error.message)}</p></div>`;
+    statusText.textContent = 'error'; return;
+  }
+  allFiles = (data || [])
+    .filter(f => f.name !== '.emptyFolderPlaceholder')
+    .map(f => {
+      const { data: { publicUrl } } = supabase.storage.from(BUCKET).getPublicUrl(`${uid}/${f.name}`);
+      return {
+        name: f.name,
+        url: publicUrl,
+        size: f.metadata?.size || 0,
+        updated: f.updated_at || f.created_at,
+        ext: getExt(f.name),
+        path: `${uid}/${f.name}`
+      };
     });
-    attachGalleryContextMenu();
+  selectedFiles.clear();
+  render();
+  statusText.textContent = 'ready';
+}
+
+// ---- Render ----
+function render() {
+  const q = (searchInput.value || '').toLowerCase().trim();
+  const files = q ? allFiles.filter(f => f.name.toLowerCase().includes(q)) : allFiles;
+  itemCount.textContent = `${files.length} item${files.length === 1 ? '' : 's'}`;
+
+  if (files.length === 0) {
+    filearea.innerHTML = q
+      ? `<div class="empty-state"><div class="big-icon">🔍</div><h3>no matches</h3><p>try a different search term.</p></div>`
+      : `<div class="empty-state">
+           <div class="big-icon">📁</div>
+           <h3>this folder is empty</h3>
+           <p>drop files here or click the button below to get started.</p>
+           <button class="empty-upload-btn" id="empty-upload-btn">
+             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+             upload your first file
+           </button>
+         </div>`;
+    if (!q) document.getElementById('empty-upload-btn')?.addEventListener('click', () => filePicker.click());
+    updateSelection(); return;
   }
-  function showImagePreview(src, title){
-    const modal=document.createElement('div'); modal.className='modal-overlay'; modal.style.background='rgba(0,0,0,0.85)'; modal.innerHTML=`<div class="modal preview-modal" style="background:transparent;padding:0;text-align:center;"><div style="position:relative;"><img src="${esc(src)}" class="preview-img" alt="${esc(title)}"><button style="position:absolute;top:10px;right:10px;background:white;border:none;border-radius:30px;width:36px;height:36px;font-size:20px;cursor:pointer;" onclick="this.closest('.modal-overlay').remove()">✕</button><div style="color:white;margin-top:12px;">${esc(title)}</div></div></div>`;
-    document.body.appendChild(modal); modal.style.display='flex'; modal.addEventListener('click',(e)=>{ if(e.target===modal) modal.remove(); });
+
+  if (currentView === 'grid') {
+    filearea.innerHTML = `<div class="files-grid">${files.map(f => `
+      <div class="file-card${selectedFiles.has(f.name) ? ' selected' : ''}" data-name="${escapeHtml(f.name)}">
+        <div class="icon">${fileIcon(f.ext)}</div>
+        <div class="name" title="${escapeHtml(f.name)}">${escapeHtml(f.name)}</div>
+      </div>`).join('')}</div>`;
+  } else {
+    filearea.innerHTML = `<div class="files-list">
+      <div class="row-head"><div>name</div><div>date modified</div><div>type</div><div>size</div></div>
+      ${files.map(f => `
+        <div class="row${selectedFiles.has(f.name) ? ' selected' : ''}" data-name="${escapeHtml(f.name)}">
+          <div class="name-cell">${fileIcon(f.ext)}<span title="${escapeHtml(f.name)}">${escapeHtml(f.name)}</span></div>
+          <div>${formatDate(f.updated)}</div>
+          <div>${fileTypeLabel(f.ext)}</div>
+          <div>${formatBytes(f.size)}</div>
+        </div>`).join('')}
+    </div>`;
   }
-  function attachGalleryContextMenu(){
-    document.querySelectorAll('.gallery-item').forEach(el=>{
-      el.removeEventListener('contextmenu', galleryContextHandler);
-      el.addEventListener('contextmenu', galleryContextHandler);
+
+  filearea.querySelectorAll('[data-name]').forEach(el => {
+    el.addEventListener('click', e => {
+      const name = el.dataset.name;
+      if (e.ctrlKey || e.metaKey) {
+        selectedFiles.has(name) ? selectedFiles.delete(name) : selectedFiles.add(name);
+      } else { selectedFiles.clear(); selectedFiles.add(name); }
+      render();
     });
-  }
-  function galleryContextHandler(e){
-    e.preventDefault(); e.stopPropagation();
-    const itemDiv=e.currentTarget; const id=parseInt(itemDiv.dataset.id);
-    const existingMenu=document.querySelector('.context-menu'); if(existingMenu) existingMenu.remove();
-    const menu=document.createElement('div'); menu.className='context-menu';
-    menu.style.left=e.clientX+'px'; menu.style.top=e.clientY+'px';
-    menu.innerHTML=`<div class="context-menu-item" data-action="preview">👁️ Preview</div><div class="context-menu-item" data-action="delete">🗑️ Delete Image</div><div class="context-menu-item" data-action="cancel">❌ Cancel</div>`;
-    document.body.appendChild(menu);
-    const handleClick=(action)=>{
-      if(action==='preview'){ const item=getGalleryItems().find(i=>i.id===id); if(item) showImagePreview(item.imageData, item.title); }
-      else if(action==='delete'){ if(confirm('Delete this image?')) deleteGalleryItem(id); }
-      menu.remove(); document.removeEventListener('click', outsideHandler);
-    };
-    const outsideHandler=(ev)=>{ if(!menu.contains(ev.target)){ menu.remove(); document.removeEventListener('click', outsideHandler); } };
-    setTimeout(()=>document.addEventListener('click', outsideHandler), 0);
-    menu.querySelectorAll('.context-menu-item').forEach(opt=>{
-      opt.addEventListener('click',(ev)=>{ ev.stopPropagation(); handleClick(opt.dataset.action); });
+    el.addEventListener('dblclick', () => {
+      const f = allFiles.find(x => x.name === el.dataset.name);
+      if (f?.url) window.open(f.url, '_blank');
     });
-  }
+  });
+  updateSelection();
+}
 
-  // Attendance, roster, summary, classes, chat, settings (original minimal versions)
-  async function renderAttendance(main){ /* simplified but functional */ const students=getStudents(); const att=getAttendance(currentDate); const map={}; att.forEach(r=>map[r.studentId]=r); main.innerHTML=`<div class="page-header"><div><div class="page-title">Daily Attendance</div><div class="page-sub">${formatDate(currentDate)}</div></div><div class="date-bar"><button id="prev-day">◀</button><input type="date" id="date-picker" value="${currentDate}"><button id="next-day">▶</button><button id="today-btn">Today</button></div></div><div class="card"><div class="student-list">${students.map(s=>`<div class="student-row" data-student-id="${s.id}"><div class="student-info"><div class="student-name">${esc(s.name)}</div></div><div class="status-group"><button class="status-btn ${map[s.id]?.status==='present'?'active-present':''}" data-status="present">✅</button><button class="status-btn ${map[s.id]?.status==='absent'?'active-absent':''}" data-status="absent">❌</button><button class="status-btn ${map[s.id]?.status==='late'?'active-late':''}" data-status="late">⏰</button></div><input class="notes-input" placeholder="Note..." value="${esc(map[s.id]?.notes||'')}"></div>`).join('')}</div></div>`;
-    document.getElementById('prev-day')?.addEventListener('click',()=>{currentDate=new Date(new Date(currentDate).setDate(new Date(currentDate).getDate()-1)).toISOString().split('T')[0]; render();});
-    document.getElementById('next-day')?.addEventListener('click',()=>{currentDate=new Date(new Date(currentDate).setDate(new Date(currentDate).getDate()+1)).toISOString().split('T')[0]; render();});
-    document.getElementById('today-btn')?.addEventListener('click',()=>{currentDate=todayStr(); render();});
-    document.getElementById('date-picker')?.addEventListener('change',e=>{currentDate=e.target.value; render();});
-    document.querySelectorAll('.status-btn').forEach(btn=>{btn.addEventListener('click',()=>{let sid=parseInt(btn.closest('.student-row').dataset.studentId); let status=btn.dataset.status; let notes=btn.closest('.student-row')?.querySelector('.notes-input')?.value||''; saveAttendance({studentId:sid,date:currentDate,status,notes}); toast(`Marked ${status}`,'success'); render();});});
-  }
-  async function renderRoster(main){ const students=getStudents(); main.innerHTML=`<div class="page-header"><div><div class="page-title">Class Roster</div></div><button class="btn btn-primary" id="open-add-modal">➕ Add Student</button></div><div class="card">${students.map(s=>`<div class="roster-row"><div class="roster-info"><div class="roster-name">${esc(s.name)}</div></div><div class="roster-actions"><button class="btn btn-ghost btn-sm edit-student" data-id="${s.id}" data-name="${esc(s.name)}">✏️ Edit</button><button class="btn btn-danger btn-sm delete-student" data-id="${s.id}">🗑️</button></div></div>`).join('')}</div>`; document.getElementById('open-add-modal')?.addEventListener('click',()=>document.getElementById('modal-add-student').style.display='flex'); document.querySelectorAll('.delete-student').forEach(btn=>btn.addEventListener('click',()=>{if(confirm('Delete?')){deleteStudent(parseInt(btn.dataset.id)); renderRoster(main);}}));}
-  async function renderSummary(main){ const sum=getAttendanceSummary(); main.innerHTML=`<div class="page-header"><div><div class="page-title">Summary</div></div></div><div class="card"><table style="width:100%"><thead><tr><th>Student</th><th>Present</th><th>Absent</th><th>Late</th></tr></thead><tbody>${sum.map(s=>`<tr><td>${esc(s.studentName)}</td><td>${s.present}</td><td>${s.absent}</td><td>${s.late}</td></tr>`).join('')}</tbody></table></div>`; }
-  async function renderMyClasses(main){ const cls=getClasses(); main.innerHTML=`<div class="page-header"><div><div class="page-title">Classes</div></div><button class="btn btn-primary" id="new-class-btn">➕ New Class</button></div>${cls.map(c=>`<div class="class-card"><div><div class="class-card-name">${esc(c.name)}</div><div>Code: ${c.classCode}</div></div><button class="btn btn-sm btn-ghost copy-code" data-code="${c.classCode}">Copy</button></div>`).join('')}`; document.getElementById('new-class-btn')?.addEventListener('click',()=>document.getElementById('modal-add-class').style.display='flex'); document.querySelectorAll('.copy-code').forEach(btn=>btn.addEventListener('click',()=>{navigator.clipboard.writeText(btn.dataset.code); toast('Copied!');}));}
-  async function renderChat(main){ main.innerHTML=`<div class="card"><div class="card-header">💬 Chat</div><div style="padding:20px;text-align:center">Chat feature available (enhanced gallery added)</div></div>`; }
-  function renderSettings(main){ main.innerHTML=`<div class="card"><div class="card-header">⚙️ Settings</div><div style="padding:20px">Sidebar, themes preserved. Gallery images stored locally.</div></div>`; }
-  function navigate(page){ currentPage=page; document.querySelectorAll('.nav-item').forEach(b=>b.classList.toggle('active',b.dataset.page===page)); render(); }
-  async function render(){ const main=document.getElementById('main'); if(currentPage==='attendance') await renderAttendance(main); else if(currentPage==='roster') await renderRoster(main); else if(currentPage==='gallery') await renderGallery(); else if(currentPage==='summary') await renderSummary(main); else if(currentPage==='classes') await renderMyClasses(main); else if(currentPage==='chat') await renderChat(main); else if(currentPage==='settings') renderSettings(main); }
-
-  // Auth (minimal but functional)
-  async function showLoginScreen(){ document.getElementById('app-layout').style.display='none'; const login=document.getElementById('login-screen'); login.style.display='flex'; login.innerHTML=`<div class="login-left"><div class="login-brand"><div class="login-logo">📚</div><div class="login-brand-name">Classroom</div></div></div><div class="login-right"><div class="login-card"><div class="login-card-title">Sign In</div><form id="login-form"><input id="auth-username" placeholder="teacher" value="teacher"><input id="auth-password" type="password" value="123"><button class="btn btn-primary">Login</button><button type="button" id="student-demo">Student Demo</button></form></div></div>`; document.getElementById('login-form').addEventListener('submit',async(e)=>{e.preventDefault(); const user={username:'teacher',role:'teacher',name:'Ms.J'}; currentUser=user; localStorage.setItem('current_user',JSON.stringify(user)); document.getElementById('login-screen').style.display='none'; launchApp(); toast('Welcome teacher');}); document.getElementById('student-demo').addEventListener('click',()=>{currentUser={id:1,role:'student',studentId:1,name:'Emma'}; localStorage.setItem('current_user',JSON.stringify(currentUser)); document.getElementById('login-screen').style.display='none'; launchApp();}); }
-  async function launchApp(){ const isStudent=currentUser?.role==='student'; document.getElementById('app-layout').style.display='flex'; if(!isStudent){ document.querySelectorAll('.nav-item').forEach(btn=>{if(btn.dataset.page) btn.addEventListener('click',()=>navigate(btn.dataset.page));}); document.getElementById('logout-btn').addEventListener('click',()=>{localStorage.removeItem('current_user'); location.reload();}); navigate('attendance');} else { showStudentDashboard(); } }
-  async function showStudentDashboard(){ const main=document.getElementById('main'); main.innerHTML=`<div class="card"><div class="card-header">🎓 Student View</div><div style="padding:20px">Welcome student! Gallery available for everyone.</div></div>`; }
-  document.addEventListener('DOMContentLoaded',async()=>{ document.getElementById('add-student-form')?.addEventListener('submit',(e)=>{ e.preventDefault(); const name=document.getElementById('student-name').value; if(name){addStudent({name,grade:document.getElementById('student-grade').value,notes:document.getElementById('student-notes').value}); toast('Student added'); document.getElementById('modal-add-student').style.display='none'; if(currentPage==='roster') render();}}); document.getElementById('add-class-form')?.addEventListener('submit',(e)=>{ e.preventDefault(); const name=document.getElementById('new-class-name').value; if(name){addClass({name,schoolName:document.getElementById('new-class-school').value,grade:document.getElementById('new-class-grade').value}); toast('Class created'); document.getElementById('modal-add-class').style.display='none'; if(currentPage==='classes') render();}}); document.getElementById('confirm-upload')?.addEventListener('click',()=>{ const fileInput=document.getElementById('gallery-file-input'); const title=document.getElementById('gallery-title').value; if(fileInput.files.length){ const reader=new FileReader(); reader.onload=(ev)=>{ addGalleryItem(title, ev.target.result); document.getElementById('modal-gallery-upload').style.display='none'; document.getElementById('gallery-title').value=''; fileInput.value=''; }; reader.readAsDataURL(fileInput.files[0]); } else toast('Select an image','error'); }); document.getElementById('cancel-upload')?.addEventListener('click',()=>document.getElementById('modal-gallery-upload').style.display='none'); document.getElementById('close-upload-modal')?.addEventListener('click',()=>document.getElementById('modal-gallery-upload').style.display='none'); const savedUser=localStorage.getItem('current_user'); if(savedUser){ currentUser=JSON.parse(savedUser); launchApp(); } else showLoginScreen(); });
-  window.closeAddModal=()=>document.getElementById('modal-add-student').style.display='none';
-  window.closeClassModal=()=>document.getElementById('modal-add-class').style.display='none';
-
-  // DOUBLE-TAP RIGHT CLICK SIMULATION (file explorer style) + image preview on single tap
-  (function setupMobileContext(){
-    let lastTap=0, lastTarget=null;
-    document.body.addEventListener('touchstart',function(e){ let target=e.target; while(target&&!target.classList?.contains('gallery-item')&&target!==document.body) target=target.parentElement; if(!target) return; const now=Date.now(); if(now-lastTap<300 && lastTarget===target){ e.preventDefault(); const event=new MouseEvent('contextmenu',{bubbles:true,cancelable:true,clientX:e.touches[0]?.clientX,clientY:e.touches[0]?.clientY}); target.dispatchEvent(event); lastTap=0; } else { lastTap=now; lastTarget=target; setTimeout(()=>{if(lastTap===now) lastTarget=null;},300); } },{passive:false});
-  })();
+function updateSelection() {
+  const n = selectedFiles.size;
+  $('cmd-download').disabled = n === 0;
+  $('cmd-delete').disabled   = n === 0;
+  selectedInfo.textContent   = n > 0 ? `${n} selected` : '';
+}
 </script>
 </body>
 </html>
