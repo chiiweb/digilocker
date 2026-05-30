@@ -6,7 +6,6 @@
 <title>DigiLocker — File Explorer</title>
 <meta name="description" content="Your personal DigiLocker — securely store, access and share documents." />
 
-<!-- Favicon as inline SVG data URI -->
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%232563eb'/%3E%3Cpath d='M6 10h8l2 3h10a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V12a2 2 0 0 1 2-2z' fill='white'/%3E%3C/svg%3E" />
 
 <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -227,7 +226,6 @@ body {
 }
 .window.hidden { display: none; }
 
-/* Title bar */
 .titlebar {
   display: flex; align-items: center;
   padding: 0 0 0 12px;
@@ -256,7 +254,6 @@ body {
 .titlebar .winbtns button:hover { background: rgba(15,23,42,0.06); }
 .titlebar .winbtns button.close-btn:hover { background: #e81123; color: #fff; }
 
-/* Command bar */
 .commandbar {
   display: flex; align-items: center; gap: 4px;
   padding: 8px 14px;
@@ -283,7 +280,6 @@ body {
 .cmd-btn svg { width: 16px; height: 16px; }
 .cmd-sep { width: 1px; height: 22px; background: var(--border); margin: 0 6px; }
 
-/* Address bar */
 .addressbar {
   display: flex; align-items: center; gap: 8px;
   padding: 6px 12px;
@@ -320,7 +316,6 @@ body {
 }
 .searchbox svg { width: 14px; height: 14px; color: var(--text-faint); }
 
-/* Body */
 .body {
   display: grid; grid-template-columns: 240px 1fr;
   background: var(--panel); min-height: 0;
@@ -350,7 +345,6 @@ body {
 }
 .side-item svg { width: 16px; height: 16px; color: var(--accent); flex-shrink: 0; }
 
-/* Main pane */
 .main { display: flex; flex-direction: column; min-width: 0; min-height: 0; }
 .main-toolbar {
   display: flex; align-items: center; gap: 6px;
@@ -376,7 +370,6 @@ body {
 }
 .filearea.drag-over { outline: 2px dashed var(--accent); outline-offset: -12px; background: var(--accent-soft-2); }
 
-/* Grid view */
 .files-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
@@ -389,11 +382,27 @@ body {
 }
 .file-card:hover { background: rgba(0,0,0,0.04); }
 .file-card.selected { background: var(--selection); border-color: var(--selection-border); }
-.file-card .icon { width: 56px; height: 56px; margin: 0 auto 6px; display: flex; align-items: center; justify-content: center; }
+.file-card .icon { width: 56px; height: 56px; margin: 0 auto 6px; display: flex; align-items: center; justify-content: center; overflow: hidden; border-radius: 6px; }
 .file-card .icon svg { width: 100%; height: 100%; }
+
+/* ===== FIX 2: image preview styles ===== */
+.file-card .icon img.file-preview-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 4px;
+  display: block;
+}
+.files-list .name-cell .thumb-preview {
+  width: 20px;
+  height: 20px;
+  object-fit: cover;
+  border-radius: 3px;
+  flex-shrink: 0;
+}
+
 .file-card .name { font-size: 12px; word-break: break-word; line-height: 1.3; max-height: 2.6em; overflow: hidden; }
 
-/* List view */
 .files-list { width: 100%; }
 .files-list .row-head, .files-list .row {
   display: grid;
@@ -413,7 +422,6 @@ body {
 .files-list .name-cell svg { width: 20px; height: 20px; flex-shrink: 0; }
 .files-list .name-cell span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-/* Empty state */
 .empty-state {
   text-align: center; padding: 72px 20px;
   color: var(--text-faint);
@@ -440,7 +448,6 @@ body {
 .empty-upload-btn:active { transform: translateY(0); }
 .empty-upload-btn svg { width: 20px; height: 20px; }
 
-/* Status bar */
 .statusbar {
   border-top: 1px solid var(--border); background: var(--chrome-2);
   padding: 4px 14px; display: flex; align-items: center; gap: 16px;
@@ -552,6 +559,7 @@ const statusText = $('status-text'), itemCount = $('item-count'), selectedInfo =
 const toast = $('toast'), searchInput = $('search-input'), authError = $('auth-error');
 let currentView = 'grid', allFiles = [], selectedFiles = new Set(), isSignUpMode = false;
 
+// ===== helpers =====
 function showToast(msg) { toast.textContent = msg; toast.classList.add('show'); clearTimeout(showToast._t); showToast._t = setTimeout(() => toast.classList.remove('show'), 2800); }
 function showAuthError(msg) { authError.textContent = msg; authError.classList.add('show'); }
 function clearAuthError() { authError.textContent = ''; authError.classList.remove('show'); }
@@ -560,9 +568,27 @@ function formatBytes(b) { if (!b) return '—'; const u = ['B','KB','MB','GB']; 
 function formatDate(d) { return d ? new Date(d).toLocaleDateString()+' '+new Date(d).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}) : '—'; }
 function getExt(name) { let i=name.lastIndexOf('.'); return i>=0 ? name.slice(i+1).toLowerCase() : ''; }
 function fileTypeLabel(ext) { const map={pdf:'PDF',jpg:'JPEG',jpeg:'JPEG',png:'PNG',gif:'GIF',webp:'WebP',doc:'DOC',docx:'DOCX',xls:'XLS',xlsx:'XLSX',txt:'TEXT',zip:'ZIP',mp4:'MP4',mp3:'MP3',mov:'MOV',avi:'AVI',json:'JSON',xml:'XML',html:'HTML',css:'CSS',js:'JS'}; return map[ext] || (ext ? ext.toUpperCase() : 'FILE'); }
-function fileIcon(ext) { const color='#0067c0'; const label=fileTypeLabel(ext).slice(0,4); const uid=`g${Math.random().toString(36).slice(2,8)}`; return `<svg viewBox="0 0 64 80"><defs><linearGradient id="${uid}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#eaeaea"/></linearGradient></defs><path d="M8 2H40L56 18V74a4 4 0 0 1-4 4H8a4 4 0 0 1-4-4V6a4 4 0 0 1 4-4z" fill="url(#${uid})" stroke="#bdbdbd" stroke-width="1"/><path d="M40 2V18H56z" fill="#cfd8dc" stroke="#bdbdbd"/><rect x="4" y="44" width="48" height="22" rx="2" fill="${color}"/><text x="28" y="59" text-anchor="middle" fill="#fff" font-family="Segoe UI,sans-serif" font-weight="700" font-size="11">${label}</text></svg>`; }
-function escapeHtml(s) { return String(s).replace(/[&<>]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[m])); }
 
+// ===== FIX 2: set of image extensions that get a real preview =====
+const IMAGE_EXTS = new Set(['jpg','jpeg','png','gif','webp','avif','svg']);
+
+function isImage(ext) { return IMAGE_EXTS.has(ext); }
+
+function fileIcon(ext, url) {
+  // FIX 2: if it's an image type AND we have a url, return an <img> tag
+  if (isImage(ext) && url) {
+    return `<img class="file-preview-img" src="${escapeHtml(url)}" alt="" loading="lazy" />`;
+  }
+  // otherwise render the colourful document SVG as before
+  const color='#0067c0';
+  const label=fileTypeLabel(ext).slice(0,4);
+  const uid=`g${Math.random().toString(36).slice(2,8)}`;
+  return `<svg viewBox="0 0 64 80"><defs><linearGradient id="${uid}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#eaeaea"/></linearGradient></defs><path d="M8 2H40L56 18V74a4 4 0 0 1-4 4H8a4 4 0 0 1-4-4V6a4 4 0 0 1 4-4z" fill="url(#${uid})" stroke="#bdbdbd" stroke-width="1"/><path d="M40 2V18H56z" fill="#cfd8dc" stroke="#bdbdbd"/><rect x="4" y="44" width="48" height="22" rx="2" fill="${color}"/><text x="28" y="59" text-anchor="middle" fill="#fff" font-family="Segoe UI,sans-serif" font-weight="700" font-size="11">${label}</text></svg>`;
+}
+
+function escapeHtml(s) { return String(s).replace(/[&<>'"]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[m])); }
+
+// ===== auth =====
 function updateAuthMode() { $('login-btn').textContent = 'Sign in'; $('signup-btn').textContent = 'Create account'; $('auth-switch-text').textContent = isSignUpMode ? 'Already have an account?' : "Don't have an account?"; $('auth-switch-link').textContent = isSignUpMode ? ' Sign in' : ' Sign up'; }
 $('auth-switch-link').addEventListener('click', () => { isSignUpMode = !isSignUpMode; clearAuthError(); updateAuthMode(); });
 $('login-btn').addEventListener('click', async () => { clearAuthError(); const email=emailInput.value.trim(), pass=passwordInput.value; if(!email||!pass){showAuthError('Enter email and password');return;} setAuthLoading(true); const{error}=await supabase.auth.signInWithPassword({email,password:pass}); if(error) showAuthError(error.message); setAuthLoading(false); });
@@ -576,40 +602,221 @@ supabase.auth.onAuthStateChange((_event,session)=>{
   else{ authScreen.classList.remove('hidden'); dashboard.classList.add('hidden'); allFiles=[]; selectedFiles.clear(); }
 });
 
+// ===== upload =====
 $('cmd-upload').addEventListener('click',()=>filePicker.click());
 filePicker.addEventListener('change',()=>{if(filePicker.files.length)handleFiles(filePicker.files);});
 filearea.addEventListener('dragover',e=>{e.preventDefault();filearea.classList.add('drag-over');});
 filearea.addEventListener('dragleave',()=>filearea.classList.remove('drag-over'));
 filearea.addEventListener('drop',e=>{e.preventDefault();filearea.classList.remove('drag-over');handleFiles(e.dataTransfer.files);});
 
-async function handleFiles(fileList){ const{data:{user}}=await supabase.auth.getUser(); if(!user||!fileList?.length)return; const files=Array.from(fileList); statusText.textContent=`Uploading ${files.length}...`; let failed=0; for(const file of files){ const path=`${user.id}/${file.name}`; const{error}=await supabase.storage.from(BUCKET).upload(path,file,{upsert:true}); if(error){failed++;console.error(error);} } filePicker.value=''; showToast(failed?`⚠️ ${failed} failed`:`✅ ${files.length} uploaded`); statusText.textContent='Upload complete'; loadDocuments(user.id); }
-$('cmd-refresh').addEventListener('click',async()=>{const{data:{user}}=await supabase.auth.getUser();if(user)loadDocuments(user.id);});
-$('cmd-download').addEventListener('click',()=>{selectedFiles.forEach(name=>{const f=allFiles.find(x=>x.name===name);if(f?.url)window.open(f.url,'_blank');});});
-$('cmd-delete').addEventListener('click',async()=>{ if(!selectedFiles.size)return; const names=[...selectedFiles]; if(!confirm(`Delete ${names.length} file(s)? Cannot undo.`))return; const{data:{user}}=await supabase.auth.getUser(); if(!user)return; statusText.textContent='Deleting...'; const paths=names.map(n=>`${user.id}/${n}`); const{error}=await supabase.storage.from(BUCKET).remove(paths); if(error){showToast('❌ '+error.message);statusText.textContent='Delete failed';return;} showToast(`🗑️ Deleted ${names.length} file(s)`); loadDocuments(user.id); });
+async function handleFiles(fileList){
+  const{data:{user}}=await supabase.auth.getUser();
+  if(!user||!fileList?.length)return;
+  const files=Array.from(fileList);
+  statusText.textContent=`Uploading ${files.length}...`;
+  let failed=0;
+  for(const file of files){
+    const path=`${user.id}/${file.name}`;
+    const{error}=await supabase.storage.from(BUCKET).upload(path,file,{upsert:true});
+    if(error){failed++;console.error(error);}
+  }
+  filePicker.value='';
+  showToast(failed?`⚠️ ${failed} failed`:`✅ ${files.length} uploaded`);
+  statusText.textContent='Upload complete';
+  loadDocuments(user.id);
+}
 
-document.querySelectorAll('.view-toggle button').forEach(btn=>{ btn.addEventListener('click',()=>{ document.querySelectorAll('.view-toggle button').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); currentView=btn.dataset.view; render(); }); });
+$('cmd-refresh').addEventListener('click',async()=>{const{data:{user}}=await supabase.auth.getUser();if(user)loadDocuments(user.id);});
+
+$('cmd-download').addEventListener('click',()=>{
+  selectedFiles.forEach(name=>{
+    const f=allFiles.find(x=>x.name===name);
+    if(f?.url)window.open(f.url,'_blank');
+  });
+});
+
+// ===== FIX 1: delete — properly await removal, only toast on success, reload after =====
+$('cmd-delete').addEventListener('click', async () => {
+  if (!selectedFiles.size) return;
+  const names = [...selectedFiles];
+  if (!confirm(`Delete ${names.length} file(s)? Cannot undo.`)) return;
+
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return;
+
+  statusText.textContent = 'Deleting…';
+
+  // disable the button while we wait so user can't double-click
+  $('cmd-delete').disabled = true;
+
+  const paths = names.map(n => `${user.id}/${n}`);
+  const { error } = await supabase.storage.from(BUCKET).remove(paths);
+
+  if (error) {
+    // only show error toast after the await resolves with a problem
+    showToast('❌ ' + error.message);
+    statusText.textContent = 'Delete failed';
+    $('cmd-delete').disabled = false;
+    return;
+  }
+
+  // only now — after storage confirmed deletion — clear state and reload
+  selectedFiles.clear();
+  showToast(`🗑️ Deleted ${names.length} file(s)`);
+  statusText.textContent = 'Deleted';
+  await loadDocuments(user.id); // await so UI is fresh before anything else runs
+});
+
+// ===== view toggle & search =====
+document.querySelectorAll('.view-toggle button').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    document.querySelectorAll('.view-toggle button').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    currentView=btn.dataset.view;
+    render();
+  });
+});
 searchInput.addEventListener('input',render);
 
-async function loadDocuments(uid){ filearea.innerHTML=`<div class="empty-state"><div class="spinner"></div><h3>Loading…</h3></div>`; statusText.textContent='Loading...'; const{data,error}=await supabase.storage.from(BUCKET).list(uid,{limit:500,sortBy:{column:'name',order:'asc'}}); if(error){ filearea.innerHTML=`<div class="empty-state"><div class="big-icon">⚠️</div><h3>Failed to load</h3><p>${escapeHtml(error.message)}</p></div>`; statusText.textContent='Error'; return; } allFiles=(data||[]).filter(f=>f.name!=='.emptyFolderPlaceholder').map(f=>{ const{data:{publicUrl}}=supabase.storage.from(BUCKET).getPublicUrl(`${uid}/${f.name}`); return{ name:f.name, url:publicUrl, size:f.metadata?.size||0, updated:f.updated_at||f.created_at, ext:getExt(f.name), path:`${uid}/${f.name}` }; }); selectedFiles.clear(); render(); statusText.textContent='Ready'; }
+// ===== load documents =====
+async function loadDocuments(uid){
+  filearea.innerHTML=`<div class="empty-state"><div class="spinner"></div><h3>Loading…</h3></div>`;
+  statusText.textContent='Loading...';
+  const{data,error}=await supabase.storage.from(BUCKET).list(uid,{limit:500,sortBy:{column:'name',order:'asc'}});
+  if(error){
+    filearea.innerHTML=`<div class="empty-state"><div class="big-icon">⚠️</div><h3>Failed to load</h3><p>${escapeHtml(error.message)}</p></div>`;
+    statusText.textContent='Error';
+    return;
+  }
+  allFiles=(data||[]).filter(f=>f.name!=='.emptyFolderPlaceholder').map(f=>{
+    const{data:{publicUrl}}=supabase.storage.from(BUCKET).getPublicUrl(`${uid}/${f.name}`);
+    return{
+      name:f.name,
+      url:publicUrl,
+      size:f.metadata?.size||0,
+      updated:f.updated_at||f.created_at,
+      ext:getExt(f.name),
+      path:`${uid}/${f.name}`
+    };
+  });
+  selectedFiles.clear();
+  render();
+  statusText.textContent='Ready';
+}
 
+// ===== render =====
 let tapTimer=null; let lastTapFile=null;
-function render(){ const q=searchInput.value.toLowerCase().trim(); let files=q?allFiles.filter(f=>f.name.toLowerCase().includes(q)):allFiles; itemCount.textContent=`${files.length} item${files.length===1?'':'s'}`; if(files.length===0){ filearea.innerHTML=q?`<div class="empty-state"><div class="big-icon">🔍</div><h3>No matches</h3><p>Try different search.</p></div>`:`<div class="empty-state"><div class="big-icon">📁</div><h3>Folder empty</h3><button class="empty-upload-btn" id="empty-upload-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>Upload your first file</button></div>`; if(!q)document.getElementById('empty-upload-btn')?.addEventListener('click',()=>filePicker.click()); updateSelection(); return; }
-if(currentView==='grid'){ filearea.innerHTML=`<div class="files-grid">${files.map(f=>`<div class="file-card${selectedFiles.has(f.name)?' selected':''}" data-name="${escapeHtml(f.name)}"><div class="icon">${fileIcon(f.ext)}</div><div class="name" title="${escapeHtml(f.name)}">${escapeHtml(f.name)}</div></div>`).join('')}</div>`; }
-else{ filearea.innerHTML=`<div class="files-list"><div class="row-head"><div>Name</div><div>Date modified</div><div>Type</div><div>Size</div></div>${files.map(f=>`<div class="row${selectedFiles.has(f.name)?' selected':''}" data-name="${escapeHtml(f.name)}"><div class="name-cell">${fileIcon(f.ext)}<span title="${escapeHtml(f.name)}">${escapeHtml(f.name)}</span></div><div>${formatDate(f.updated)}</div><div>${fileTypeLabel(f.ext)}</div><div>${formatBytes(f.size)}</div></div>`).join('')}</div>`; }
-filearea.querySelectorAll('[data-name]').forEach(el=>{ const fileName=el.dataset.name; const fileObj=files.find(f=>f.name===fileName);
-  const handleSelect=(e,isContext=false)=>{ e.preventDefault(); if(isContext){ selectedFiles.clear(); selectedFiles.add(fileName); render(); showContextMenu(fileName); return; } if(e.ctrlKey||e.metaKey){ selectedFiles.has(fileName)?selectedFiles.delete(fileName):selectedFiles.add(fileName); }else{ if(selectedFiles.has(fileName)&&selectedFiles.size===1){} else{ selectedFiles.clear(); selectedFiles.add(fileName); } } render(); };
-  el.addEventListener('click',(e)=>handleSelect(e,false));
-  el.addEventListener('contextmenu',(e)=>handleSelect(e,true));
-  // Mobile double-tap -> right-click simulation (2 fast taps)
-  el.addEventListener('touchstart',(e)=>{ const now=Date.now(); if(tapTimer && lastTapFile===fileName && (now-tapTimer)<300){ e.preventDefault(); handleSelect(e,true); tapTimer=null; lastTapFile=null; }else{ tapTimer=now; lastTapFile=fileName; setTimeout(()=>{ if(tapTimer===now){ tapTimer=null; lastTapFile=null; } },320); } });
-  el.addEventListener('dblclick',()=>{ if(fileObj?.url)window.open(fileObj.url,'_blank'); });
-});
-updateSelection(); }
 
-function showContextMenu(fileName){ const f=allFiles.find(x=>x.name===fileName); if(!f)return; const action=confirm(`Right-click on "${fileName}"\n\nOpen? (OK = Open, Cancel = Show options)`); if(action){ window.open(f.url,'_blank'); }else{ const deleteConfirm=confirm(`Delete "${fileName}"?`); if(deleteConfirm){ (async()=>{ const{data:{user}}=await supabase.auth.getUser(); if(!user)return; const paths=[`${user.id}/${fileName}`]; await supabase.storage.from(BUCKET).remove(paths); showToast(`Deleted ${fileName}`); loadDocuments(user.id); })(); } } }
-function updateSelection(){ const n=selectedFiles.size; $('cmd-download').disabled=n===0; $('cmd-delete').disabled=n===0; selectedInfo.textContent=n>0?`${n} selected`:''; }
-// Sidebar basic interactions (demo filters)
-document.querySelectorAll('.side-item').forEach(item=>{ item.addEventListener('click',()=>{ document.querySelectorAll('.side-item').forEach(i=>i.classList.remove('active')); item.classList.add('active'); if(item.dataset.filter==='recent'){ const sorted=[...allFiles].sort((a,b)=>new Date(b.updated)-new Date(a.updated)); allFiles=sorted; render(); setTimeout(()=>loadDocuments((supabase.auth.getUser()).then(({data})=>data.user?.id)),100); }else if(item.dataset.filter==='all'){ location.reload(); }else{ showToast('Demo: category filters coming soon'); } }); });
+function render(){
+  const q=searchInput.value.toLowerCase().trim();
+  let files=q?allFiles.filter(f=>f.name.toLowerCase().includes(q)):allFiles;
+  itemCount.textContent=`${files.length} item${files.length===1?'':'s'}`;
+
+  if(files.length===0){
+    filearea.innerHTML=q
+      ?`<div class="empty-state"><div class="big-icon">🔍</div><h3>No matches</h3><p>Try different search.</p></div>`
+      :`<div class="empty-state"><div class="big-icon">📁</div><h3>Folder empty</h3><button class="empty-upload-btn" id="empty-upload-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>Upload your first file</button></div>`;
+    if(!q)document.getElementById('empty-upload-btn')?.addEventListener('click',()=>filePicker.click());
+    updateSelection();
+    return;
+  }
+
+  if(currentView==='grid'){
+    // FIX 2: pass f.url to fileIcon so images get <img> instead of SVG
+    filearea.innerHTML=`<div class="files-grid">${
+      files.map(f=>`<div class="file-card${selectedFiles.has(f.name)?' selected':''}" data-name="${escapeHtml(f.name)}">
+        <div class="icon">${fileIcon(f.ext, f.url)}</div>
+        <div class="name" title="${escapeHtml(f.name)}">${escapeHtml(f.name)}</div>
+      </div>`).join('')
+    }</div>`;
+  } else {
+    // FIX 2: in details/list view, show tiny thumbnail for images instead of the SVG icon
+    filearea.innerHTML=`<div class="files-list">
+      <div class="row-head"><div>Name</div><div>Date modified</div><div>Type</div><div>Size</div></div>
+      ${files.map(f=>`<div class="row${selectedFiles.has(f.name)?' selected':''}" data-name="${escapeHtml(f.name)}">
+        <div class="name-cell">
+          ${isImage(f.ext) && f.url
+            ? `<img class="thumb-preview" src="${escapeHtml(f.url)}" alt="" loading="lazy" />`
+            : `<svg viewBox="0 0 64 80" style="width:20px;height:20px">${fileIcon(f.ext,'')}</svg>`
+          }
+          <span title="${escapeHtml(f.name)}">${escapeHtml(f.name)}</span>
+        </div>
+        <div>${formatDate(f.updated)}</div>
+        <div>${fileTypeLabel(f.ext)}</div>
+        <div>${formatBytes(f.size)}</div>
+      </div>`).join('')}
+    </div>`;
+  }
+
+  filearea.querySelectorAll('[data-name]').forEach(el=>{
+    const fileName=el.dataset.name;
+    const fileObj=files.find(f=>f.name===fileName);
+
+    const handleSelect=(e,isContext=false)=>{
+      e.preventDefault();
+      if(isContext){ selectedFiles.clear(); selectedFiles.add(fileName); render(); showContextMenu(fileName); return; }
+      if(e.ctrlKey||e.metaKey){ selectedFiles.has(fileName)?selectedFiles.delete(fileName):selectedFiles.add(fileName); }
+      else{ selectedFiles.clear(); selectedFiles.add(fileName); }
+      render();
+    };
+
+    el.addEventListener('click',(e)=>handleSelect(e,false));
+    el.addEventListener('contextmenu',(e)=>handleSelect(e,true));
+    el.addEventListener('touchstart',(e)=>{
+      const now=Date.now();
+      if(tapTimer && lastTapFile===fileName && (now-tapTimer)<300){ e.preventDefault(); handleSelect(e,true); tapTimer=null; lastTapFile=null; }
+      else{ tapTimer=now; lastTapFile=fileName; setTimeout(()=>{ if(tapTimer===now){ tapTimer=null; lastTapFile=null; } },320); }
+    });
+    el.addEventListener('dblclick',()=>{ if(fileObj?.url)window.open(fileObj.url,'_blank'); });
+  });
+
+  updateSelection();
+}
+
+function showContextMenu(fileName){
+  const f=allFiles.find(x=>x.name===fileName);
+  if(!f)return;
+  const action=confirm(`Right-click on "${fileName}"\n\nOpen? (OK = Open, Cancel = Show options)`);
+  if(action){ window.open(f.url,'_blank'); }
+  else{
+    const deleteConfirm=confirm(`Delete "${fileName}"?`);
+    if(deleteConfirm){
+      (async()=>{
+        const{data:{user}}=await supabase.auth.getUser();
+        if(!user)return;
+        // FIX 1 applied here too: await the remove and only reload after it completes
+        const{error}=await supabase.storage.from(BUCKET).remove([`${user.id}/${fileName}`]);
+        if(error){ showToast('❌ '+error.message); return; }
+        showToast(`🗑️ Deleted ${fileName}`);
+        selectedFiles.delete(fileName);
+        await loadDocuments(user.id);
+      })();
+    }
+  }
+}
+
+function updateSelection(){
+  const n=selectedFiles.size;
+  $('cmd-download').disabled=n===0;
+  $('cmd-delete').disabled=n===0;
+  selectedInfo.textContent=n>0?`${n} selected`:'';
+}
+
+// sidebar
+document.querySelectorAll('.side-item').forEach(item=>{
+  item.addEventListener('click',()=>{
+    document.querySelectorAll('.side-item').forEach(i=>i.classList.remove('active'));
+    item.classList.add('active');
+    if(item.dataset.filter==='recent'){
+      allFiles=[...allFiles].sort((a,b)=>new Date(b.updated)-new Date(a.updated));
+      render();
+    }else if(item.dataset.filter==='all'){
+      location.reload();
+    }else{
+      showToast('Demo: category filters coming soon');
+    }
+  });
+});
 </script>
 </body>
 </html>
